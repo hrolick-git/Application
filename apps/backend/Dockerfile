@@ -1,19 +1,24 @@
+# apps/backend/Dockerfile
+
 FROM node:20-bullseye-slim
 
-# debian bullseye has libssl1.1 which Prisma needs
-
+# Встановлюємо робочу директорію
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY apps/backend/package.json ./apps/backend/
-COPY apps/backend/prisma ./apps/backend/prisma
+# Копіюємо тільки package.json та package-lock.json для кешування npm install
+COPY apps/backend/package*.json ./
 
+# Встановлюємо залежності
 RUN npm install --legacy-peer-deps
 
-COPY . .
+# Копіюємо весь бекенд (включно з Prisma)
+COPY apps/backend .
 
-RUN npm run prisma:generate -w backend
+# Генеруємо Prisma Client
+RUN npx prisma generate
 
+# Відкриваємо порт бекенду
 EXPOSE 4000
 
-CMD ["npm", "run", "start:dev", "-w", "backend"]
+# Команда для запуску
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]

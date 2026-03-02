@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.9"
 
 services:
   db:
@@ -22,7 +22,7 @@ services:
       - .env
     ports:
       - "4000:4000"
-    command: npm run start:dev -w backend
+    command: sh -c "npx prisma migrate deploy && npm run start:dev"
 
   frontend:
     build:
@@ -34,7 +34,7 @@ services:
       - "5173:5173"
     env_file:
       - .env
-    command: npm run dev -w frontend
+    command: npm run dev
 
 volumes:
   db_data:
