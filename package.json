@@ -1,0 +1,23 @@
+{
+  "name": "Application",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend \"npm run dev -w apps/backend\" \"npm run dev -w apps/frontend\"",
+    "lint": "npm run lint -w apps/backend && npm run lint -w apps/frontend",
+    "test": "npm run test -w apps/backend && npm run test -w apps/frontend",
+    "test:e2e": "npx playwright test",
+    "format": "npm run format -w apps/backend && npm run format -w apps/frontend",
+    "db:generate": "npm run prisma:generate -w apps/backend",
+    "db:migrate": "npm run prisma:migrate -w apps/backend",
+    "db:seed": "npm run prisma:seed -w apps/backend",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down -v"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "playwright": "^1.51.0"
+  }
+}

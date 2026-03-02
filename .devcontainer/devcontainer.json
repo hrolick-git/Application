@@ -1,0 +1,14 @@
+{
+  "name": "Event Management PoC",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/workspaces/event-management-system-poc",
+  "extensions": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-playwright.playwright"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  }
+}

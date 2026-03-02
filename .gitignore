@@ -1,0 +1,20 @@
+# Node
+node_modules/
+dist/
+*.log
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# Prisma
+.prisma/
+
+# Build artifacts
+apps/backend/dist/
+apps/frontend/dist/
