@@ -16,6 +16,7 @@ export function CreateEvent() {
     const data: any = { title, description, startsAt, location, visibility };
     if (endsAt) data.endsAt = endsAt;
     if (capacity) data.capacity = capacity;
+
     try {
       const res = await api.post('/events', data);
       navigate(`/events/${res.data.id}`);

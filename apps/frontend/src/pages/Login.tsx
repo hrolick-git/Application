@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import { useStore } from '../store/useStore';
 
@@ -8,25 +9,41 @@ export function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const setUser = useStore((s) => s.setUser);
+  const navigate = useNavigate();
 
   const submit = async () => {
     try {
       const path = isLogin ? 'login' : 'register';
       const res = await api.post(`/auth/${path}`, { email, password });
-      if (isLogin) {
-        localStorage.setItem('token', res.data.access_token);
-        setUser({ id: '', email });
-      }
+      const token = res.data.access_token;
+
+      if (!token) throw new Error('Не вдалося отримати токен');
+
+      // Зберігаємо токен + email
+      localStorage.setItem('token', token);
+      localStorage.setItem('email', email);
+
+      // Підтягуємо користувача з бекенду
+      const me = await api.get('/users/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUser(me.data);
+
+      navigate('/my-events');
     } catch (e: any) {
-      setError(e.response?.data?.message || 'error');
+      setError(e.response?.data?.message || e.message || 'Помилка входу');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
+    <div className="mx-auto w-full max-w-md sm:px-4 md:w-96 md:max-w-sm md:px-0">
       <h2 className="text-xl mb-4">{isLogin ? 'Увійти' : 'Реєстрація'}</h2>
+      <p>test@x.com</p>
+      <p>abc123</p>
       <div className="space-y-2">
         <input
+          type="email"
           className="border p-2 w-full"
           placeholder="Email"
           value={email}

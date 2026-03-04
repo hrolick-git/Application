@@ -11,7 +11,7 @@ interface Event {
   endsAt?: string;
   location: string;
   capacity?: number;
-  visibility: string;
+  visibility: 'PUBLIC' | 'PRIVATE';
   participants: { user: { email: string } }[];
   organizerId: string;
   joined?: boolean;
@@ -22,13 +22,32 @@ export function EventDetails() {
   const { id } = useParams();
   const [event, setEvent] = useState<Event | null>(null);
   const navigate = useNavigate();
+  const user = useStore((s) => s.user);
+
+  // Fetch event
   const fetch = async () => {
-    const res = await api.get(`/events/${id}`);
-    setEvent(res.data);
+    try {
+      let res;
+      const token = localStorage.getItem('token');
+      if (token) {
+        // користувач залогінений — запит на приватні і публічні події
+        res = await api.get(`/events/${id}`);
+      } else {
+        // користувач не залогінений — тільки публічні
+        res = await api.get(`/events/public/${id}`);
+      }
+      setEvent(res.data);
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Помилка завантаження події');
+      navigate('/events');
+    }
   };
+
   useEffect(() => {
     fetch();
   }, [id]);
+
   const toggle = async () => {
     if (!event) return;
     if (event.joined) {
@@ -38,21 +57,25 @@ export function EventDetails() {
     }
     fetch();
   };
+
   const del = async () => {
     if (window.confirm('Ви впевнені, що хочете видалити цю подію?')) {
       await api.delete(`/events/${id}`);
       navigate('/events');
     }
   };
+
   if (!event) return <div>Loading...</div>;
-  const isOrganizer = event.organizerId === useStore.getState().user?.id;
+
+  const isOrganizer = event.organizerId === user?.id;
+
   return (
     <div className="p-4">
       <h1 className="text-2xl">{event.title}</h1>
       <p>{event.description}</p>
       <p>
-        {new Date(event.startsAt).toLocaleString()}{' '}
-        {event.endsAt && `– ${new Date(event.endsAt).toLocaleString()}`}
+        {new Date(event.startsAt).toLocaleString()}
+        {event.endsAt && ` – ${new Date(event.endsAt).toLocaleString()}`}
       </p>
       <p>{event.location}</p>
       <p>{event.capacity ?? '∞'}</p>
@@ -61,15 +84,19 @@ export function EventDetails() {
           <li key={idx}>{p.user.email}</li>
         ))}
       </ul>
-      <button
-        disabled={event.full && !event.joined}
-        onClick={toggle}
-        className={`mt-2 px-3 py-1 rounded ${
-          event.joined ? 'bg-red-500' : 'bg-green-500'
-        } text-white`}
-      >
-        {event.joined ? 'Вийти' : event.full ? 'Повне' : 'Приєднатись'}
-      </button>
+
+      {event.visibility === 'PUBLIC' || user ? (
+        <button
+          disabled={event.full && !event.joined}
+          onClick={toggle}
+          className={`mt-2 px-3 py-1 rounded ${
+            event.joined ? 'bg-red-500' : 'bg-green-500'
+          } text-white`}
+        >
+          {event.joined ? 'Вийти' : event.full ? 'Повне' : 'Приєднатись'}
+        </button>
+      ) : null}
+
       {isOrganizer && (
         <div className="mt-4 space-x-2">
           <button

@@ -8,7 +8,9 @@ import {
   Param,
   Req,
   UseGuards,
-  UsePipes
+  UsePipes,
+  NotFoundException,
+  ForbiddenException
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -20,17 +22,38 @@ import { ValidationPipe } from '../common/pipes/validation.pipe';
 export class EventsController {
   constructor(private events: EventsService) {}
 
+  /** Список подій */
   @Get()
   async list(@Req() req: any) {
     const userId = req.user?.id;
     return this.events.list(userId);
   }
 
+  /** Конкретна подія */
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async get(@Param('id') id: string, @Req() req: any) {
-    return this.events.get(id, req.user?.id);
+    const userId = req.user?.id; // отримуємо id залогіненого користувача
+    return this.events.get(id, userId); // передаємо в сервіс
   }
 
+  /** Публічні події */
+  @Get('public')
+  async publicList() {
+    return this.events.findPublicEvents();
+  }
+
+  /** Публічна конкретна подія */
+  @Get('public/:id')
+  async publicEvent(@Param('id') id: string) {
+    const event = await this.events.findById(id);
+    if (!event || event.visibility !== 'PUBLIC') {
+      throw new NotFoundException('Подія не знайдена');
+    }
+    return event;
+  }
+
+  /** Створення події */
   @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(new ValidationPipe(createEventSchema))
@@ -38,6 +61,7 @@ export class EventsController {
     return this.events.create(dto, req.user.id);
   }
 
+  /** Редагування події */
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UsePipes(new ValidationPipe(updateEventSchema))
@@ -45,12 +69,14 @@ export class EventsController {
     return this.events.update(id, dto, req.user.id);
   }
 
+  /** Видалення події */
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string, @Req() req: any) {
     return this.events.delete(id, req.user.id);
   }
 
+  /** Join / Leave */
   @UseGuards(JwtAuthGuard)
   @Post(':id/join')
   async join(@Param('id') id: string, @Req() req: any) {

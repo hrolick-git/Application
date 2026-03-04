@@ -7,10 +7,20 @@ interface User {
 
 interface State {
   user: User | null;
-  setUser: (u: User | null) => void;
+  setUser: (user: User | null) => void;
+  logout: () => void;
 }
 
 export const useStore = create<State>((set) => ({
-  user: null,
-  setUser: (u) => set({ user: u })
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
+  setUser: (user) => {
+    set({ user });
+    if (user) localStorage.setItem('user', JSON.stringify(user));
+    else localStorage.removeItem('user');
+  },
+  logout: () => {
+    set({ user: null });
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  },
 }));
