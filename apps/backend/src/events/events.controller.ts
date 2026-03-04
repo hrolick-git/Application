@@ -10,7 +10,6 @@ import {
   UseGuards,
   UsePipes,
   NotFoundException,
-  ForbiddenException
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -20,24 +19,13 @@ import { ValidationPipe } from '../common/pipes/validation.pipe';
 
 @Controller('events')
 export class EventsController {
-  constructor(private events: EventsService) {}
+  constructor(private readonly events: EventsService) {}
 
-  /** Список подій */
-  @Get()
-  async list(@Req() req: any) {
-    const userId = req.user?.id;
-    return this.events.list(userId);
-  }
+  /* =======================
+     🌍 ПУБЛІЧНІ РОУТИ
+     ======================= */
 
-  /** Конкретна подія */
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  async get(@Param('id') id: string, @Req() req: any) {
-    const userId = req.user?.id; // отримуємо id залогіненого користувача
-    return this.events.get(id, userId); // передаємо в сервіс
-  }
-
-  /** Публічні події */
+  /** Список публічних подій */
   @Get('public')
   async publicList() {
     return this.events.findPublicEvents();
@@ -47,10 +35,30 @@ export class EventsController {
   @Get('public/:id')
   async publicEvent(@Param('id') id: string) {
     const event = await this.events.findById(id);
+
     if (!event || event.visibility !== 'PUBLIC') {
       throw new NotFoundException('Подія не знайдена');
     }
+
     return event;
+  }
+
+  /* =======================
+     🔐 АВТОРИЗОВАНІ РОУТИ
+     ======================= */
+
+  /** Список подій (PUBLIC + свої PRIVATE) */
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async list(@Req() req: any) {
+    return this.events.list(req.user.id);
+  }
+
+  /** Конкретна подія (PUBLIC або своя PRIVATE) */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getById(@Param('id') id: string, @Req() req: any) {
+    return this.events.get(id, req.user.id);
   }
 
   /** Створення події */
@@ -61,28 +69,33 @@ export class EventsController {
     return this.events.create(dto, req.user.id);
   }
 
-  /** Редагування події */
+  /** Редагування події (тільки організатор) */
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UsePipes(new ValidationPipe(updateEventSchema))
-  async update(@Param('id') id: string, @Body() dto: UpdateEventDto, @Req() req: any) {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateEventDto,
+    @Req() req: any,
+  ) {
     return this.events.update(id, dto, req.user.id);
   }
 
-  /** Видалення події */
+  /** Видалення події (тільки організатор) */
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string, @Req() req: any) {
     return this.events.delete(id, req.user.id);
   }
 
-  /** Join / Leave */
+  /** Join */
   @UseGuards(JwtAuthGuard)
   @Post(':id/join')
   async join(@Param('id') id: string, @Req() req: any) {
     return this.events.join(id, req.user.id);
   }
 
+  /** Leave */
   @UseGuards(JwtAuthGuard)
   @Post(':id/leave')
   async leave(@Param('id') id: string, @Req() req: any) {

@@ -25,6 +25,13 @@ export function CalendarView({ events, initialDate, eventClick }: Props) {
       height="auto"
       locale="uk"
       eventClick={eventClick} // передаємо в FullCalendar
+      eventClassNames={(arg) => {
+        const visibility = arg.event.extendedProps.visibility;
+        const classes = ["cursor-pointer"];
+
+        if (visibility === "PRIVATE") return ["event-private", ...classes];
+        return ["event-public", ...classes];
+      }}
     />
   );
 }

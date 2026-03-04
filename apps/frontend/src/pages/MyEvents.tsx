@@ -25,6 +25,7 @@ export function MyEvents() {
           extendedProps: {
             description: e.description,
             location: e.location,
+            visibility: e.visibility,
           },
         }));
 

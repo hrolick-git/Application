@@ -5,3 +5,13 @@
 body {
   font-family: system-ui, sans-serif;
 }
+
+.event-public {
+  background-color: #3b82f6 !important; /* blue */
+  border-color: #3b82f6 !important;
+}
+
+.event-private {
+  background-color: #9333ea !important; /* purple */
+  border-color: #9333ea !important;
+}

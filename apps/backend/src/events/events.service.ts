@@ -8,15 +8,25 @@ export class EventsService {
   /** Список подій для користувача або публічних */
   async list(userId?: string) {
     const events = await this.prisma.event.findMany({
+      where: {
+        OR: [
+          { visibility: 'PUBLIC' },
+          ...(userId ? [{ organizerId: userId }] : []),
+        ],
+      },
       orderBy: { startsAt: 'asc' },
       include: { participants: true },
     });
 
-    return events.map((e) => {
-      const isJoined = userId ? e.participants.some(p => p.userId === userId) : false;
-      const isFull = e.capacity ? e.participants.length >= e.capacity : false;
-      return { ...e, joined: isJoined, full: isFull };
-    });
+    return events.map((e) => ({
+      ...e,
+      joined: userId
+        ? e.participants.some(p => p.userId === userId)
+        : false,
+      full: e.capacity
+        ? e.participants.length >= e.capacity
+        : false,
+    }));
   }
 
   /** Отримати конкретну подію */
@@ -95,7 +105,13 @@ export class EventsService {
   async findById(id: string) {
     return this.prisma.event.findUnique({
       where: { id },
-      include: { participants: { include: { user: true } } },
+      include: {
+        participants: {
+          include: {
+            user: { select: { email: true, id: true } }
+          }
+        }
+      }
     });
   }
 }
