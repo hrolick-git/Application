@@ -13,6 +13,8 @@ import api from './api/api';
 import "./styles/index.css";
 import { EditEvent } from "./pages/EditEvent";
 import { Register } from "./pages/Register";
+import { Settings } from "./pages/Settings";
+import { Profile } from "./pages/Profile";
 
 export function App() {
   const setUser = useStore((s) => s.setUser);
@@ -72,6 +74,16 @@ export function App() {
             <Route path="/events/:id/edit" element={
                 <ProtectedRoute>
                   <EditEvent />
+                </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
             } />
             <Route path="*" element={<EventsList />} />

@@ -6,6 +6,10 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+.tippy-box[data-theme~='light-border'] {
+  @apply bg-white text-slate-700 shadow-2xl rounded-xl border border-slate-100 font-medium p-2 text-sm;
+}
+
 .event-public {
   background-color: #3b82f6 !important; /* blue */
   border-color: #3b82f6 !important;
@@ -14,6 +18,15 @@ body {
 .event-private {
   background-color: #9333ea !important; /* purple */
   border-color: #9333ea !important;
+}
+
+/* Наприклад, у твоїх стилях */
+.fc-event.event-public {
+  @apply bg-indigo-600 border-none rounded-lg p-0.5;
+}
+
+.fc-event.event-private {
+  @apply bg-slate-500 border-none rounded-lg p-0.5 opacity-80;
 }
 
 @layer components {

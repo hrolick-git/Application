@@ -5,12 +5,16 @@ import { CalendarView } from "../components/CalendarView";
 import { Loader } from "../components/Loader";
 import { EmptyState } from "../components/EmptyState";
 import { CalendarIcon, MagnifyingGlassIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { useStore } from "../store/useStore";
 
 export function MyEvents() {
+  const setGlobalEvents = useStore((s) => s.setEvents);
+  const user = useStore((s) => s.user);
   const [events, setEvents] = useState<any[]>([]);
   const [initialDate, setInitialDate] = useState<Date>(new Date());
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     (async () => {
@@ -18,33 +22,31 @@ export function MyEvents() {
         const res = await api.get("/users/me/events", {
           withCredentials: true,
         });
+        setGlobalEvents(res.data);
 
-        const backendEvents = res.data.map((e: any) => ({
+        const calendarEvents = res.data.map((e: any) => ({
           id: e.id,
           title: e.title,
           start: e.startsAt,
-          end: e.endsAt ?? undefined,
           extendedProps: {
             description: e.description,
-            location: e.location,
-            visibility: e.visibility,
+            isCreator: e.organizerId === user?.id,
+            isAttending: true,
           },
         }));
 
-        setEvents(backendEvents);
+        setEvents(calendarEvents);
 
-        if (backendEvents.length > 0) {
-          // Встановлюємо дату на першу подію в календарі для зручності
-          setInitialDate(new Date(backendEvents[0].start));
+        if (calendarEvents.length > 0) {
+          setInitialDate(new Date(calendarEvents[0].start));
         }
-
         setLoaded(true);
       } catch (err) {
         console.error(err);
         setLoaded(true);
       }
     })();
-  }, []);
+  }, [user?.id, setGlobalEvents]);
 
   if (!loaded) return <Loader />;
 
@@ -80,6 +82,9 @@ export function MyEvents() {
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest rounded-full">
                 Personal Schedule
+              </span>
+              <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest rounded-full">
+                {events.length} Upcoming {events.length === 1 ? 'Event' : 'Events'}
               </span>
             </div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tight">My Events</h1>
