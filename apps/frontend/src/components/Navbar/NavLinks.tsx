@@ -25,7 +25,7 @@ export const NavLinks = ({ isAuthenticated }: NavLinksProps) => {
         <>
           <Link to="/my-events" className={getLinkClass('/my-events')}>
             <CalendarIcon className="w-5 h-5" />
-            <span>My Schedule</span>
+            <span>My Events</span>
           </Link>
           <Link to="/events/new" className={getLinkClass('/events/new')}>
             <PlusCircleIcon className="w-5 h-5" />
