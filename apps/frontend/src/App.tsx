@@ -11,6 +11,8 @@ import { useEffect, useState } from 'react';
 import { useStore } from './store/useStore';
 import api from './api/api';
 import "./styles/index.css";
+import { EditEvent } from "./pages/EditEvent";
+import { Register } from "./pages/Register";
 
 export function App() {
   const setUser = useStore((s) => s.setUser);
@@ -36,12 +38,12 @@ export function App() {
 
   return (
     <AppInit>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Navbar />
-        <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+        <div className="mx-auto max-w-7xl">
           <Routes>
-            <Route path="/auth" element={<Login />} />
-
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route
               path="/my-events"
               element={
@@ -67,7 +69,11 @@ export function App() {
                 </ProtectedRoute>
               }
             />
-
+            <Route path="/events/:id/edit" element={
+                <ProtectedRoute>
+                  <EditEvent />
+                </ProtectedRoute>
+            } />
             <Route path="*" element={<EventsList />} />
           </Routes>
         </div>

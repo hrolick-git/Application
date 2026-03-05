@@ -7,10 +7,10 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  async register(email: string, password: string) {
+  async register(email: string, password: string, name: string) {
     const hash = await bcrypt.hash(password, 10);
     try {
-      return await this.prisma.user.create({ data: { email, passwordHash: hash } });
+      return await this.prisma.user.create({ data: { email, passwordHash: hash, name } });
     } catch (err: any) {
       // P2002 is Prisma unique constraint violation (email already exists)
       if (err.code === 'P2002' && err.meta?.target?.includes('email')) {

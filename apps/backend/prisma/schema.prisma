@@ -10,6 +10,7 @@ datasource db {
 model User {
   id           String      @id @default(uuid())
   email        String      @unique
+  name         String?
   passwordHash String
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -36,7 +37,7 @@ model Event {
 model Participant {
   user       User   @relation(fields: [userId], references: [id])
   userId     String
-  event      Event  @relation(fields: [eventId], references: [id])
+  event      Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId    String
   joinedAt   DateTime @default(now())
 

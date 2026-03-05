@@ -70,16 +70,15 @@ export class EventsController {
   }
 
   /** Редагування події (тільки організатор) */
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  @UsePipes(new ValidationPipe(updateEventSchema))
-  async update(
-    @Param('id') id: string,
-    @Body() dto: UpdateEventDto,
-    @Req() req: any,
-  ) {
-    return this.events.update(id, dto, req.user.id);
-  }
+@UseGuards(JwtAuthGuard)
+@Patch(':id')
+async update(
+  @Param('id') id: string,
+  @Body(new ValidationPipe(updateEventSchema)) dto: UpdateEventDto, // ДОДАЙТЕ СЮДИ
+  @Req() req: any,
+) {
+  return this.events.update(id, dto, req.user.id);
+}
 
   /** Видалення події (тільки організатор) */
   @UseGuards(JwtAuthGuard)

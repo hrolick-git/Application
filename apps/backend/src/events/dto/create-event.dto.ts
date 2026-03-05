@@ -1,13 +1,13 @@
 import * as yup from 'yup';
 
 export const createEventSchema = yup.object({
-  title: yup.string().required(),
+  title: yup.string().required("Назва обов'язкова"),
   description: yup.string().optional(),
-  startsAt: yup.date().required(),
-  endsAt: yup.date().min(yup.ref('startsAt')).optional(),
-  location: yup.string().required(),
-  capacity: yup.number().integer().positive().optional(),
-  visibility: yup.string().oneOf(['PUBLIC', 'PRIVATE']).required()
+  startsAt: yup.date().required("Дата початку обов'язкова"),
+  endsAt: yup.date().nullable().optional(),
+  location: yup.string().required("Локація обов'язкова"),
+  capacity: yup.number().integer().nullable().optional(),
+  visibility: yup.string().oneOf(['PUBLIC', 'PRIVATE']).default('PUBLIC')
 });
 
 export class CreateEventDto {

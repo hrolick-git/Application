@@ -23,7 +23,7 @@ export function CalendarView({ events, initialDate, eventClick }: Props) {
       }}
       events={events}
       height="auto"
-      locale="uk"
+      locale="en"
       eventClick={eventClick} // передаємо в FullCalendar
       eventClassNames={(arg) => {
         const visibility = arg.event.extendedProps.visibility;

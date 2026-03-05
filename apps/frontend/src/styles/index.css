@@ -15,3 +15,47 @@ body {
   background-color: #9333ea !important; /* purple */
   border-color: #9333ea !important;
 }
+
+@layer components {
+  /* Стиль для самої сітки */
+  .fc-theme-standard .fc-scrollgrid {
+    @apply border-none !important;
+  }
+
+  .fc-theme-standard td, .fc-theme-standard th {
+    @apply border-slate-100 !important;
+  }
+
+  /* Назви днів тижня (Пн, Вт...) */
+  .fc .fc-col-header-cell-cushion {
+    @apply text-slate-400 font-bold text-xs uppercase tracking-wider py-3 !important;
+  }
+
+  /* Числа місяця */
+  .fc .fc-daygrid-day-number {
+    @apply text-slate-600 font-medium p-3 !important;
+  }
+
+  /* СТИЛЬ ПОДІЙ (як на вашому скрині, але краще) */
+  .fc-v-event, .fc-h-event {
+    @apply border-none rounded-lg px-2 py-1 shadow-sm !important;
+  }
+
+  .fc-event-title {
+    @apply font-bold text-[11px] !important;
+  }
+
+  .fc-event-time {
+    @apply opacity-80 font-medium text-[10px] mr-1 !important;
+  }
+
+  /* Сьогоднішній день */
+  .fc .fc-day-today {
+    @apply bg-indigo-50/30 !important;
+  }
+
+  /* Кнопки FullCalendar (якщо не робили свої) */
+  .fc .fc-button-primary {
+    @apply bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 focus:ring-2 focus:ring-indigo-500 transition-all !important;
+  }
+}

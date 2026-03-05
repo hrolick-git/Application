@@ -11,7 +11,7 @@ export class AuthController {
   @Post('register')
   @UsePipes(new ValidationPipe(registerSchema))
   async register(@Body() dto: RegisterDto) {
-    return this.auth.register(dto.email, dto.password);
+    return this.auth.register(dto.email, dto.password, dto.name);
   }
 
   @Post('login')

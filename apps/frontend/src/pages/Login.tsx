@@ -1,69 +1,40 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
-import { useStore } from '../store/useStore';
+import { AuthForm } from '../components/AuthForm';
 
 export function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
-  const setUser = useStore((s) => s.setUser);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const submit = async () => {
+  const handleLogin = async (data: any) => {
+    setLoading(true);
     try {
-      const path = isLogin ? 'login' : 'register';
-      const res = await api.post(`/auth/${path}`, { email, password });
-      const token = res.data.access_token;
-
-      if (!token) throw new Error('Не вдалося отримати токен');
-
-      // Зберігаємо токен + email
-      localStorage.setItem('token', token);
-      localStorage.setItem('email', email);
-
-      // Підтягуємо користувача з бекенду
-      const me = await api.get('/users/me', {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await api.post('/auth/login', {
+        email: data.email,
+        password: data.password
       });
 
-      setUser(me.data);
-
-      navigate('/my-events');
-    } catch (e: any) {
-      setError(e.response?.data?.message || e.message || 'Помилка входу');
+      // Збереження токена (переконайся, що назва поля в response.data правильна)
+      localStorage.setItem('token', response.data.access_token);
+      
+      // Можна додати сповіщення або просто редирект
+      navigate('/events');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto w-full max-w-md sm:px-4 md:w-96 md:max-w-sm md:px-0">
-      <h2 className="text-xl mb-4">{isLogin ? 'Увійти' : 'Реєстрація'}</h2>
-      <p>test@x.com</p>
-      <p>abc123</p>
-      <div className="space-y-2">
-        <input
-          type="email"
-          className="border p-2 w-full"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          className="border p-2 w-full"
-          placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button className="bg-blue-500 text-white px-4 py-2" onClick={submit}>
-          {isLogin ? 'Увійти' : 'Зареєструватися'}
-        </button>
-        {error && <p className="text-red-500">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      <div className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-100 border border-slate-100">
+        <h1 className="text-4xl font-black text-slate-900 mb-2">Welcome Back! 👋</h1>
+        <p className="text-slate-500 mb-10 font-medium">Good to see you again. Log in to your account.</p>
+        
+        <AuthForm type="login" onSubmit={handleLogin} isLoading={loading} />
       </div>
-      <button className="mt-4 text-sm" onClick={() => setIsLogin(!isLogin)}>
-        {isLogin ? 'Перейти до реєстрації' : 'Перейти до входу'}
-      </button>
     </div>
   );
 }
