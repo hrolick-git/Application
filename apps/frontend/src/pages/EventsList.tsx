@@ -60,7 +60,7 @@ export function EventsList() {
   if (loading) return <Loader />;
 
 return (
-    <div className="p-6 bg-slate-50/30 min-h-screen">
+    <div className="p-6 bg-slate-50/30">
       <div className="max-w-7xl mx-auto">
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>

@@ -34,7 +34,7 @@ export function CreateEvent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/30 p-6">
+    <div className="bg-slate-50/30 p-6">
       <div className="max-w-xl mx-auto">
         {/* Back Button */}
         <button 

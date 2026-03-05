@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface User {
   id: string;
@@ -12,16 +13,16 @@ interface State {
   logout: () => void;
 }
 
-export const useStore = create<State>((set) => ({
-  user: JSON.parse(localStorage.getItem('user') || 'null'),
-  setUser: (user) => {
-    set({ user });
-    if (user) localStorage.setItem('user', JSON.stringify(user));
-    else localStorage.removeItem('user');
-  },
-  logout: () => {
-    set({ user: null });
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-  },
-}));
+export const useStore = create<State>()(
+  persist(
+    (set) => ({
+      user: null,
+      setUser: (user) => set({ user }),
+      logout: () => {
+        set({ user: null });
+        localStorage.removeItem('token'); // Токен краще видаляти окремо
+      },
+    }),
+    { name: 'user-storage' } // Назва ключа в LocalStorage
+  )
+);

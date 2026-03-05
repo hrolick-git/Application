@@ -71,7 +71,7 @@ export function MyEvents() {
   };
 
   return (
-    <div className="p-6 md:p-10 bg-slate-50/30 min-h-screen">
+    <div className="p-6 md:p-10 bg-slate-50/30">
       <div className="max-w-7xl mx-auto">
         
         {/* Header Section */}

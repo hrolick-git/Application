@@ -93,7 +93,7 @@ export function EventDetails() {
   const joined = event.joined || event.participants.some(p => p.user.email === user?.email);
 
   return (
-    <div className="min-h-screen bg-slate-50/30 p-6">
+    <div className="bg-slate-50/30 p-6">
       <div className="max-w-3xl mx-auto">
         {/* Кнопка Back */}
         <button 
