@@ -72,3 +72,65 @@ body {
     @apply bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 focus:ring-2 focus:ring-indigo-500 transition-all !important;
   }
 }
+
+/* Закруглення для всього календаря */
+.fc {
+  border: none !important;
+  font-family: inherit;
+}
+
+/* Закруглення самих комірок (днів) */
+.fc-theme-standard td, .fc-theme-standard th {
+  border: 1px solid #f1f5f9 !important; /* Дуже світлий колір сітки (slate-100) */
+}
+
+/* Робимо заголовки днів (Пн, Вт...) стильними */
+.fc-col-header-cell {
+  padding: 12px 0 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  color: #64748b; /* slate-500 */
+}
+
+/* Головна фішка: закруглення івентів */
+.fc-event {
+  border-radius: 8px !important; /* М'які кути для івентів */
+  margin: 2px 4px !important;
+  border: none !important;
+  transition: transform 0.2s ease !important;
+}
+
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Ховаємо точки (dots) та робимо івенти плашками */
+.fc-daygrid-event-dot {
+  display: none !important;
+}
+
+/* Сьогоднішній день */
+.fc-day-today {
+  background: #f8fafc !important; /* Легкий фон для сьогодні (slate-50) */
+}
+
+/* Кнопки навігації (Prev, Next, Today) */
+.fc-button {
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  font-weight: 700 !important;
+  text-transform: capitalize !important;
+  border-radius: 12px !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+
+.fc-button-primary:not(:disabled):active, 
+.fc-button-primary:not(:disabled).fc-button-active {
+  background: #f1f5f9 !important;
+  color: #4f46e5 !important;
+}
