@@ -9,7 +9,7 @@ export default defineConfig({
     // ПЕРЕНЕСИ СЮДИ:
     allowedHosts: [
       'frontend-production-0751.up.railway.app',
-      '.up.railway.app' // Додала про всяк випадок, щоб працювало на будь-якому піддомені Railway
+      '.up.railway.app'
     ],
   },
   build: {
