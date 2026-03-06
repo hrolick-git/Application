@@ -29,7 +29,16 @@ export function Settings() {
   return (
     <div className="max-w-3xl mx-auto py-12 px-6 animate-fade-in">
       <h1 className="text-4xl font-black text-slate-900 mb-10 tracking-tight">Settings</h1>
-
+      <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center space-x-3 text-amber-800">
+        <div className="p-2 bg-amber-100 rounded-lg">
+          <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <p className="text-sm font-medium">
+          <strong>Work in Progress:</strong> This page is currently a visual-only preview. Backend integration and settings persistence are coming soon.
+        </p>
+      </div>
       <div className="space-y-8">
         {/* Profile Settings */}
         <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-indigo-50/50">

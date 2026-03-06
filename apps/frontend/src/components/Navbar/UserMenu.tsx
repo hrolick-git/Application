@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { UserCircleIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, PlusCircleIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
 interface UserMenuProps {
   user: any;
@@ -29,6 +29,15 @@ export const UserMenu = ({ user, onLogout }: UserMenuProps) => {
 
   return (
     <div className="flex items-center space-x-1 border-l pl-6 border-slate-100">
+      <div className="flex md:hidden items-center space-x-1 mr-2">
+      <Link to="/my-events" className={getLinkClass('/my-events')} title="My Events">
+          <CalendarIcon className="w-6 h-6" />
+        </Link>
+        <Link to="/events/new" className={getLinkClass('/events/new')} title="Create">
+          <PlusCircleIcon className="w-6 h-6" />
+        </Link>
+      </div>
+
       <Link to="/profile" className={getLinkClass('/profile')} title="Profile">
         <UserCircleIcon className="w-6 h-6" />
         <span className="hidden sm:inline font-medium uppercase tracking-tight text-sm">
