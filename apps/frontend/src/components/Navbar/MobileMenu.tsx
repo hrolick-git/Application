@@ -40,27 +40,47 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
           <span className="font-bold">Explore</span>
         </Link>
 
-{user ? (
-           // Секція для авторизованих
-           <>
-             <Link to="/my-events" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl active:scale-95 transition-transform">
-               <div className="bg-white p-2 rounded-xl shadow-sm">
-                 <CalendarIcon className="w-6 h-6 text-indigo-600" />
-               </div>
-               <span className="font-bold text-slate-700">My Schedule</span>
-             </Link>
-             {/* ... інші лінки ... */}
-           </>
+        {user ? (
+            <>
+            {/* Лінки для авторизованих користувачів */}
+            <Link to="/my-events" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl font-bold text-slate-700">
+                <CalendarIcon className="w-6 h-6 text-indigo-600" />
+                <span>My Schedule</span>
+            </Link>
+            
+            <Link to="/events/new" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl font-bold text-slate-700">
+                <PlusCircleIcon className="w-6 h-6 text-indigo-600" />
+                <span>Create Event</span>
+            </Link>
+
+            {/* Секція профілю та налаштувань */}
+            <div className="mt-4 pt-4 border-t border-slate-100 space-y-1">
+                <Link to="/profile" onClick={onClose} className="flex items-center space-x-3 p-4 text-slate-600 hover:bg-slate-50 rounded-xl">
+                <UserCircleIcon className="w-6 h-6 text-slate-400" />
+                <span className="font-medium">Account Profile</span>
+                </Link>
+                
+                <Link to="/settings" onClick={onClose} className="flex items-center space-x-3 p-4 text-slate-600 hover:bg-slate-50 rounded-xl">
+                <Cog6ToothIcon className="w-6 h-6 text-slate-400" />
+                <span className="font-medium">Settings</span>
+                </Link>
+                
+                <button 
+                onClick={() => { onLogout(); onClose(); }} 
+                className="flex items-center space-x-3 w-full p-4 text-red-500 font-bold hover:bg-red-50 rounded-xl transition-colors"
+                >
+                <ArrowRightOnRectangleIcon className="w-6 h-6" />
+                <span>Sign Out</span>
+                </button>
+            </div>
+            </>
         ) : (
-           // Секція для неавторизованих
-           <div className="mt-10 flex flex-col space-y-4 pt-10 border-t border-slate-100">
-             <Link to="/login" onClick={onClose} className="w-full py-4 bg-indigo-600 text-white text-center font-bold rounded-2xl shadow-lg">
-               Sign In
-             </Link>
-             <Link to="/register" onClick={onClose} className="w-full py-4 border-2 border-slate-200 text-slate-600 text-center font-bold rounded-2xl">
-               Create Account
-             </Link>
-           </div>
+            /* Кнопки для тих, хто не ввійшов */
+            <div className="mt-6 space-y-3">
+            <Link to="/login" onClick={onClose} className="block w-full py-4 bg-indigo-600 text-white text-center font-bold rounded-2xl shadow-lg shadow-indigo-100">
+                Sign In
+            </Link>
+            </div>
         )}
       </div>
     </div>
