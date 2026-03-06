@@ -1,24 +1,23 @@
-# apps/backend/Dockerfile
-
 FROM node:20-bullseye-slim
 
-# Встановлюємо робочу директорію
 WORKDIR /app
 
-# Копіюємо тільки package.json та package-lock.json для кешування npm install
-COPY apps/backend/package*.json ./
+# 1. Копіюємо файли залежностей
+COPY package*.json ./
 
-# Встановлюємо залежності
+# 2. Встановлюємо залежності
 RUN npm install --legacy-peer-deps
 
-# Копіюємо весь бекенд (включно з Prisma)
-COPY apps/backend .
+# 3. Копіюємо папку prisma ОКРЕМО перед іншим кодом (це надійніше)
+COPY prisma ./prisma/
 
-# Генеруємо Prisma Client
-RUN npx prisma generate
+# 4. Копіюємо решту коду бекенду
+COPY . .
 
-# Відкриваємо порт бекенду
+# 5. Генеруємо клієнт, явно вказуючи шлях, якщо потрібно
+RUN npx prisma generate --schema ./prisma/schema.prisma
+
 EXPOSE 4000
 
-# Команда для запуску
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+# Використовуємо node для продакшну замість start:dev, якщо це можливо
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
