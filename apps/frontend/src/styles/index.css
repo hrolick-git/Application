@@ -134,3 +134,21 @@ body {
   background: #f1f5f9 !important;
   color: #4f46e5 !important;
 }
+
+/* Адаптація календаря для мобільних пристроїв */
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    flex-direction: column; /* Ставимо заголовок над кнопками */
+    gap: 0.5rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.25rem !important; /* Зменшуємо шрифт заголовка */
+    font-weight: 800;
+  }
+
+  .fc .fc-button {
+    padding: 0.4rem 0.6rem !important; /* Робимо кнопки трохи меншими */
+    font-size: 0.875rem !important;
+  }
+}

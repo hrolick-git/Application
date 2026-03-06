@@ -1,0 +1,68 @@
+import { Link } from 'react-router-dom';
+import { 
+  CalendarIcon, 
+  PlusCircleIcon, 
+  UserCircleIcon, 
+  Cog6ToothIcon, 
+  ArrowRightOnRectangleIcon,
+  TicketIcon,
+  XMarkIcon,
+  UserPlusIcon,
+  ArrowRightStartOnRectangleIcon
+} from '@heroicons/react/24/outline';
+
+interface MobileMenuProps {
+  user: any;
+  onLogout: () => void;
+  onClose: () => void;
+}
+
+export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
+  return (
+    <div 
+      style={{ backgroundColor: '#ffffff', opacity: 1 }}
+      className="fixed top-0 right-0 h-full w-[80%] max-w-[320px] z-[100] shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300 border-l border-slate-100"
+    >
+      <div className="flex justify-between items-center mb-8">
+        <span className="text-xl font-black text-slate-800">EventHub</span>
+        <button 
+          onClick={onClose} 
+          className="p-2 bg-slate-100 rounded-xl hover:bg-red-50 text-slate-600 hover:text-red-500 transition-colors"
+        >
+          <XMarkIcon className="w-6 h-6" />
+        </button>
+      </div>
+
+      <div className="flex flex-col space-y-4 overflow-y-auto">
+        {/* Контент тепер буде на 100% білому фоні */}
+        <Link to="/events" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl">
+          <TicketIcon className="w-6 h-6 text-indigo-600" />
+          <span className="font-bold">Explore</span>
+        </Link>
+
+{user ? (
+           // Секція для авторизованих
+           <>
+             <Link to="/my-events" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl active:scale-95 transition-transform">
+               <div className="bg-white p-2 rounded-xl shadow-sm">
+                 <CalendarIcon className="w-6 h-6 text-indigo-600" />
+               </div>
+               <span className="font-bold text-slate-700">My Schedule</span>
+             </Link>
+             {/* ... інші лінки ... */}
+           </>
+        ) : (
+           // Секція для неавторизованих
+           <div className="mt-10 flex flex-col space-y-4 pt-10 border-t border-slate-100">
+             <Link to="/login" onClick={onClose} className="w-full py-4 bg-indigo-600 text-white text-center font-bold rounded-2xl shadow-lg">
+               Sign In
+             </Link>
+             <Link to="/register" onClick={onClose} className="w-full py-4 border-2 border-slate-200 text-slate-600 text-center font-bold rounded-2xl">
+               Create Account
+             </Link>
+           </div>
+        )}
+      </div>
+    </div>
+  );
+};
