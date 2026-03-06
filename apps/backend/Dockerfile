@@ -2,22 +2,27 @@ FROM node:20-bullseye-slim
 
 WORKDIR /app
 
-# Копіюємо package.json з поточної директорії (apps/backend)
+# Встановлюємо лише необхідні системні бібліотеки для Prisma
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 
-# Встановлюємо залежності
-RUN npm install --legacy-peer-deps
+# Використовуємо ci для чистої та швидкої інсталяції
+RUN npm ci --legacy-peer-deps
 
-# Копіюємо папку prisma ТА решту коду
 COPY . .
 
-# Генеруємо клієнт (шлях відносний до WORKDIR /app)
+# Генеруємо клієнт Prisma
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
-# Збірка проекту (якщо у тебе TypeScript)
+# Збірка NestJS (створює папку /dist)
 RUN npm run build
+
+# Видаляємо devDependencies, щоб зменшити розмір образу та споживання RAM
+RUN npm prune --production
 
 EXPOSE 4000
 
-# Запускаємо міграції та сервер однією командою
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
+# ЗАПУСК: Використовуємо node dist/main замість npm run start
+# Це критично для економії пам'яті!
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
