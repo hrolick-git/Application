@@ -2,27 +2,28 @@ FROM node:20-bullseye-slim
 
 WORKDIR /app
 
-# Встановлюємо лише необхідні системні бібліотеки для Prisma
+# Системні бібліотеки для Prisma
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
+# Railway зазвичай запускає збірку з кореня вибраної Root Directory (apps/backend)
+# Тому копіюємо файли відносно цієї папки
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Використовуємо ci для чистої та швидкої інсталяції
 RUN npm ci --legacy-peer-deps
 
+# Копіюємо решту коду
 COPY . .
 
-# Генеруємо клієнт Prisma
+# Генеруємо клієнт, явно вказуючи шлях
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
-# Збірка NestJS (створює папку /dist)
 RUN npm run build
 
-# Видаляємо devDependencies, щоб зменшити розмір образу та споживання RAM
+# Очищення для економії пам'яті
 RUN npm prune --production
 
 EXPOSE 4000
 
-# ЗАПУСК: Використовуємо node dist/main замість npm run start
-# Це критично для економії пам'яті!
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+# Використовуємо прямий шлях до схеми в CMD
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main"]
