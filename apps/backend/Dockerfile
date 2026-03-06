@@ -10,7 +10,7 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Встановлюємо залежності
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Копіюємо решту коду бекенду
 COPY . .
