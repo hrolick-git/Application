@@ -12,8 +12,11 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
 
   // Логіка визначення статусу
   const isPrivate = event.visibility === 'PRIVATE';
-  const isJoined = event.joined || event.participants?.some((p: any) => 
-    (typeof p === 'string' ? p === user?.id : p.user?.email === user?.email)
+  const isJoined = !!user && (
+    event.joined || 
+    event.participants?.some((p: any) => 
+      (typeof p === 'string' ? p === user?.id : p.user?.email === user?.email)
+    )
   );
   const isFull = event.capacity ? event.participants?.length >= event.capacity : false;
 
