@@ -28,4 +28,4 @@ EXPOSE 4000
 
 # Команда запуску: ТУТ МИ МІНЯЄМО ШЛЯХ ДО СХЕМИ
 # В кінці вашого Dockerfile
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/src/main.js"]
