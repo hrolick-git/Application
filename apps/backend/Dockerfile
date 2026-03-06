@@ -22,7 +22,7 @@ RUN npx prisma generate --schema ./prisma/schema.prisma
 RUN npm run build
 
 # Видаляємо зайве для економії пам'яті
-RUN npm prune --production
+RUN npm prune --production --legacy-peer-deps
 
 EXPOSE 4000
 
