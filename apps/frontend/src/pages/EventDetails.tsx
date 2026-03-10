@@ -23,7 +23,7 @@ interface Event {
   location: string;
   capacity?: number;
   visibility: 'PUBLIC' | 'PRIVATE';
-  participants: { user: { email: string } }[];
+  participants: { user: { email: string } }[] | undefined;
   organizerId: string;
   joined?: boolean;
   full?: boolean;
@@ -38,17 +38,18 @@ export function EventDetails() {
 
   const fetch = async () => {
     try {
-      let res;
+      setLoading(true);
       const token = localStorage.getItem('token');
-      if (token) {
-        res = await api.get(`/events/${id}`);
-      } else {
-        res = await api.get(`/events/public/${id}`);
-      }
+      const res = await api.get(token ? `/events/${id}` : `/events/public/${id}`);
       setEvent(res.data);
     } catch (err: any) {
-      console.error(err);
-      navigate('/events');
+      console.error("Fetch error:", err);
+      if (err.response?.status === 401) {
+        const publicRes = await api.get(`/events/public/${id}`);
+        setEvent(publicRes.data);
+      } else {
+        navigate('/events');
+      }
     } finally {
       setLoading(false);
     }
@@ -89,8 +90,7 @@ export function EventDetails() {
 
   const isOrganizer = event.organizerId === user?.id;
   const isPrivate = event.visibility === 'PRIVATE';
-  const full = event.capacity ? event.participants.length >= event.capacity : false;
-  const joined = event.joined || event.participants.some(p => p.user.email === user?.email);
+  const participantsList = event.participants || [];
 
   return (
     <div className="bg-slate-50/30 p-6">
@@ -184,7 +184,7 @@ export function EventDetails() {
                   <div>
                     <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Capacity</p>
                     <p className="font-bold text-slate-700">
-                      {event.participants.length} / {event.capacity ?? '∞'} participants
+                      {participantsList.length} / {event.capacity ?? '∞'} participants
                     </p>
                   </div>
                 </div>
@@ -195,9 +195,9 @@ export function EventDetails() {
             <div>
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6">Who's Coming</h3>
               <div className="bg-slate-50/50 rounded-[2rem] p-6 border border-slate-100">
-                {event.participants.length > 0 ? (
+                {participantsList.length > 0 ? (
                   <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                    {event.participants.map((p, idx) => (
+                    {participantsList.map((p, idx) => (
                       <div key={idx} className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-200 to-slate-300 flex items-center justify-center text-[10px] font-bold text-slate-600">
                           {p.user.email[0].toUpperCase()}

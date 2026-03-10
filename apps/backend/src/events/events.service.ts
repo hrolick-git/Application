@@ -15,17 +15,12 @@ export class EventsService {
         ],
       },
       orderBy: { startsAt: 'asc' },
-      include: { participants: true },
+      include: { participants: true }, // Prisma тягне дані
     });
 
-    return events.map((e) => ({
+    return JSON.parse(JSON.stringify(events)).map((e: any) => ({
       ...e,
-      joined: userId
-        ? e.participants.some(p => p.userId === userId)
-        : false,
-      full: e.capacity
-        ? e.participants.length >= e.capacity
-        : false,
+      joined: userId ? e.participants.some((p: any) => p.userId === userId) : false,
     }));
   }
 
@@ -52,7 +47,10 @@ export class EventsService {
     if (new Date(data.startsAt) < new Date()) {
       throw new ForbiddenException('Не можна створити подію у минулому');
     }
-    return this.prisma.event.create({ data: { ...data, organizerId: userId } });
+    return this.prisma.event.create({ 
+      data: { ...data, organizerId: userId },
+      include: { participants: true } // ДОДАЄМО ТУТ
+    });
   }
 
   /** Редагувати */
@@ -94,11 +92,13 @@ export class EventsService {
 
   /** Публічні події */
   async findPublicEvents() {
-    return this.prisma.event.findMany({
+    const events = await this.prisma.event.findMany({
       where: { visibility: 'PUBLIC' },
       orderBy: { startsAt: 'asc' },
-      include: { participants: true },
+      include: { participants: true }, // ОБОВ'ЯЗКОВО ДОДАЄМО ТУТ
     });
+
+    return JSON.parse(JSON.stringify(events));
   }
 
   /** Отримати подію без авторизації */
