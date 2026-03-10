@@ -20,7 +20,6 @@ const handleRegister = async (data: any) => {
     // 1. Save the token (so subsequent requests to the API will work)
     const token = loginRes.data.access_token;
     localStorage.setItem('token', token);
-    console.log('Login Response Data:', loginRes.data);
     // 2. Update the ZUSTAND store (this is what was missing!)
     // Extract the setUser function from the store
     const setUser = useStore.getState().setUser;
