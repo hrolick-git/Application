@@ -2,6 +2,8 @@
 
 > A full-stack web application for event management with registration, calendar view, and JWT authentication.
 
+🌐 **Live Demo:** [https://frontend-production-0751.up.railway.app](https://frontend-production-0751.up.railway.app)
+
 ![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=node.js&logoColor=white)
 ![NestJS](https://img.shields.io/badge/NestJS-10-E0234E?style=flat-square&logo=nestjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)
