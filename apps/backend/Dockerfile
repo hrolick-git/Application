@@ -19,4 +19,4 @@ RUN npm run build
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "ls -la /app && ls -la /app/dist 2>/dev/null || echo 'NO DIST FOLDER' && npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
+CMD ["sh", "-c", "ls -la /app/dist/ && npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
