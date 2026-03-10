@@ -22,14 +22,8 @@ services:
       - .env
     ports:
       - "4000:4000"
-    volumes:
-      - ./apps/backend:/app
-      - /app/node_modules
-    command: >
-      sh -c "npm install prisma @prisma/client --legacy-peer-deps && 
-             npx prisma generate --schema ./prisma/schema.prisma && 
-             npx prisma migrate deploy --schema ./prisma/schema.prisma && 
-             node dist/main.js"
+    command: sh -c "npx prisma migrate deploy && npm run start:dev"
+
   frontend:
     build:
       context: .
@@ -40,6 +34,7 @@ services:
       - "5173:5173"
     env_file:
       - .env
+    command: npm run dev
 
 volumes:
   db_data:

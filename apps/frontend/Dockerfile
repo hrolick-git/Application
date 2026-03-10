@@ -1,15 +1,9 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
-
 COPY package*.json ./
-COPY apps/frontend/package*.json ./apps/frontend/
-
+COPY apps/frontend/package.json ./apps/frontend/
 RUN npm install --legacy-peer-deps
-
-RUN npm install @fullcalendar/core @fullcalendar/daygrid @fullcalendar/react --legacy-peer-deps
-
 COPY . .
-
 RUN npm run build -w frontend
 
 FROM node:20-alpine

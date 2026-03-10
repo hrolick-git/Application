@@ -4,18 +4,19 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-ENV PRISMA_CLI_QUERY_ENGINE_TYPE=library
-ENV PRISMA_CLIENT_ENGINE_TYPE=library
-
-COPY apps/backend/package*.json ./
-COPY apps/backend/prisma/ ./prisma/
+COPY package*.json ./
+COPY prisma ./prisma/
 
 RUN npm install --legacy-peer-deps
 
-COPY apps/backend/ .
+COPY . .
 
-RUN npx nest build
+RUN npx prisma generate --schema ./prisma/schema.prisma
+
+RUN npm run build
+
+RUN npm prune --production --legacy-peer-deps
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "npx prisma generate --schema ./prisma/schema.prisma && npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/src/main.js"]
