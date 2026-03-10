@@ -5,15 +5,15 @@ import { SearchBar } from '../components/SearchBar';
 import { useStore } from '../store/useStore';
 import { EventCard } from '../components/EventCard';
 import { EmptyState } from '../components/EmptyState';
-import { motion, Variants } from 'framer-motion'; // Імпортуємо motion
+import { motion, Variants } from 'framer-motion';
 
-// 1. Variants для контейнера (щоб керувати дітьми)
+// 1. Variants for the container that holds all event cards
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // Затримка між появою кожної картки
+      staggerChildren: 0.1, // Delay between the appearance of each card
     },
   },
 };
@@ -85,7 +85,7 @@ export function EventsList() {
     <div className="p-6 bg-slate-50/30 min-h-screen">
       <div className="max-w-7xl mx-auto">
         
-        {/* Анімований заголовок */}
+        {/* Animated header */}
         <motion.header 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -99,7 +99,7 @@ export function EventsList() {
         </motion.header>
 
         {filteredEvents.length > 0 ? (
-          /* Контейнер для карток з ефектом stagger */
+          /* Container for event cards with stagger effect */
           <motion.div 
             variants={containerVariants}
             initial="hidden"

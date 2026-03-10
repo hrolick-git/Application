@@ -15,17 +15,17 @@ const createAPIClient = () => {
   const { hostname } = window.location;
   console.log('🔍 Current hostname:', hostname);
   
-  // Якщо localhost - використовуємо localhost:4000
+  // if localhost not exist - use localhost:4000
   if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
     console.log('✅ Localhost detected, using http://localhost:4000');
     return axios.create({ baseURL: 'http://localhost:4000' });
   }
   
-  // Для GitHub Codespaces: порт фронтенду -> порт бекенду
-  // Використовуємо той же протокол, що й у сторінці (https у Codespaces),
-  // і замінюємо порт 5173 на 4000 у hostname.
+  // For GitHub Codespaces: port frontend -> port backend
+  // We use the same protocol as in the page (https in Codespaces),
+  // and replace port 5173 with 4000 in the hostname.
   const backendHostname = hostname.replace(/-5173\./, '-4000.');
-  const protocol = window.location.protocol; // 'https:' у Codespaces
+  const protocol = window.location.protocol; // 'https:' in Codespaces
   const baseURL = `${protocol}//${backendHostname}`;
   console.log('✅ Codespaces detected, using:', baseURL);
   return axios.create({ baseURL });

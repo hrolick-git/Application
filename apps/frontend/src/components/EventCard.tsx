@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { PencilSquareIcon, MapPinIcon, CalendarDaysIcon, UsersIcon, LockClosedIcon } from '@heroicons/react/24/outline';
-import { JoinButton } from './JoinButton'; // Імпортуємо нашу нову кнопку
+import { JoinButton } from './JoinButton';
 
 interface EventCardProps {
   event: any;
   isOrganizer: boolean;
-  onRefresh: () => void; // Змінюємо onToggleJoin на onRefresh
+  onRefresh: () => void;
 }
 
 export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) {
@@ -75,8 +75,6 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
           />
         </div>
       </div>
-
-      {/* Використовуємо універсальну кнопку */}
       <JoinButton event={e} onRefresh={onRefresh} />
     </div>
   );

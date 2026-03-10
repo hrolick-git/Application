@@ -17,20 +17,20 @@ const handleRegister = async (data: any) => {
       password: data.password
     });
 
-    // 1. Зберігаємо токен для майбутніх запитів
+    // 1. Save the token (so subsequent requests to the API will work)
     const token = loginRes.data.access_token;
     localStorage.setItem('token', token);
     console.log('Login Response Data:', loginRes.data);
-    // 2. ОНОВЛЮЄМО СТАН В REACТ (Zustand)
-    // Витягуємо функцію setUser зі стору
+    // 2. Update the ZUSTAND store (this is what was missing!)
+    // Extract the setUser function from the store
     const setUser = useStore.getState().setUser;
     
-    // Перевіряємо, чи є юзер у відповіді. 
-    // Якщо бекенд не шле об'єкт user, можна створити його вручну з email
+    // Check if the user is in the response.
+    // If the backend doesn't send a user object yet, we can create it manually from the email
     const userData = loginRes.data.user || { email: data.email, id: 'temp-id' };
     setUser(userData); 
 
-    // 3. Тепер переходимо
+    // 3. Redirect to the events page
     navigate('/events');
   } catch (err: any) {
     alert(err.response?.data?.message || 'Registration failed');

@@ -8,7 +8,7 @@ import { CalendarIcon, MagnifyingGlassIcon, SparklesIcon } from "@heroicons/reac
 import { useStore } from "../store/useStore";
 import { motion } from "framer-motion";
 
-// Налаштування анімації (як у Profile)
+// Settings for animations (similar to Profile)
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
@@ -28,10 +28,10 @@ export function MyEvents() {
       try {
         const res = await api.get("/users/me/events", { withCredentials: true });
         
-        // Зберігаємо оригінали для стору (статистика в Profile)
+        // Save the original data for the store (statistics in Profile)
         setGlobalEvents(res.data);
 
-        // Форматуємо для календаря
+        // Format for the calendar
         const calendarEvents = res.data.map((e: any) => ({
           id: e.id,
           title: e.title,

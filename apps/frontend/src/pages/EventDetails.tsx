@@ -95,7 +95,7 @@ export function EventDetails() {
   return (
     <div className="bg-slate-50/30 p-6">
       <div className="max-w-3xl mx-auto">
-        {/* Кнопка Back */}
+        {/* Back button */}
         <button 
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center text-slate-500 hover:text-indigo-600 transition-colors font-medium text-sm group"
@@ -216,7 +216,7 @@ export function EventDetails() {
                 <JoinButton 
                   event={event} 
                   onRefresh={fetch} 
-                  className="py-5 text-lg" // робимо кнопку більшою для сторінки деталей
+                  className="py-5 text-lg" // make the button larger for the details page
                 />
               </div>
             </div>
