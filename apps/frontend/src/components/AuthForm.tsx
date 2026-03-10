@@ -19,7 +19,6 @@ export function AuthForm({ type, onSubmit, isLoading }: AuthFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with data:", formData);
     onSubmit(formData);
   };
 

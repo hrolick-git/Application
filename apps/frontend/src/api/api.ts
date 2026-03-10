@@ -3,7 +3,6 @@ import axios from 'axios';
 const createAPIClient = () => {
   const env = import.meta.env.VITE_API_URL;
   if (env) {
-    console.log('✅ Using VITE_API_URL:', env);
     return axios.create({ baseURL: env });
   }
   
