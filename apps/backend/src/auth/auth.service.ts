@@ -31,11 +31,10 @@ export class AuthService {
     
     return { 
       access_token: this.jwt.sign(payload),
-      // ДОДАЄМО ОБ'ЄКТ USER ТУТ:
       user: {
         id: user.id,
         email: user.email,
-        name: user.name // Тепер фронтенд побачить ім'я відразу
+        name: user.name
       }
     };
   }

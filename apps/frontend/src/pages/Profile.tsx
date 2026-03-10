@@ -1,6 +1,7 @@
 import { useStore } from "../store/useStore";
 import { CalendarDaysIcon, RocketLaunchIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const container = {
   hidden: { opacity: 0 },
@@ -25,10 +26,18 @@ export function Profile() {
   // 2. Get events and user from the store (we will use events to calculate statistics)
   const events = useStore((s) => s.events);
   const user = useStore((s) => s.user);
+  const fetchEvents = useStore((s) => s.fetchEvents);
+  
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   // 3. Calculate statistics
   const organizedCount = events.filter(e => e.organizerId === user?.id).length;
-  const joinedCount = events.filter(e => e.organizerId !== user?.id).length;
+  const joinedCount = events.filter(e => {
+      if (e.joined !== undefined) return e.joined;
+      return e.participants?.some((p: any) => p.userId === user?.id);
+    }).length;
 
   const stats = [
     { 

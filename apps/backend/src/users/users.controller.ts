@@ -6,18 +6,16 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  // ✅ Новий ендпоінт /users/me
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Req() req: any) {
     const user = await this.usersService.findById(req.user.id);
     if (!user) {
-      return null; // або можна кинути NotFoundException()
+      return null;
     }
     return { id: user.id, email: user.email };
   }
 
-  // Існуючий /users/me/events
   @UseGuards(JwtAuthGuard)
   @Get('me/events')
   getMyEvents(@Req() req: any) {
