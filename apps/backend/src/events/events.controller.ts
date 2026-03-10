@@ -22,16 +22,16 @@ export class EventsController {
   constructor(private readonly events: EventsService) {}
 
   /* =======================
-     🌍 ПУБЛІЧНІ РОУТИ
+     🌍 Public routers
      ======================= */
 
-  /** Список публічних подій */
+  /** List public events */
   @Get('public')
   async publicList() {
     return this.events.findPublicEvents();
   }
 
-  /** Публічна конкретна подія */
+  /** Public specific event */
   @Get('public/:id')
   async publicEvent(@Param('id') id: string) {
     const event = await this.events.findById(id);
@@ -44,24 +44,24 @@ export class EventsController {
   }
 
   /* =======================
-     🔐 АВТОРИЗОВАНІ РОУТИ
+     🔐 Authenticated routers
      ======================= */
 
-  /** Список подій (PUBLIC + свої PRIVATE) */
+  /** List events (PUBLIC + your PRIVATE) */
   @UseGuards(JwtAuthGuard)
   @Get()
   async list(@Req() req: any) {
     return this.events.list(req.user.id);
   }
 
-  /** Конкретна подія (PUBLIC або своя PRIVATE) */
+  /** Specific event (PUBLIC or your PRIVATE) */
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getById(@Param('id') id: string, @Req() req: any) {
     return this.events.get(id, req.user.id);
   }
 
-  /** Створення події */
+  /** Create event */
   @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(new ValidationPipe(createEventSchema))
@@ -69,7 +69,7 @@ export class EventsController {
     return this.events.create(dto, req.user.id);
   }
 
-  /** Редагування події (тільки організатор) */
+  /** Update event (only organizer) */
 @UseGuards(JwtAuthGuard)
 @Patch(':id')
 async update(
@@ -80,7 +80,7 @@ async update(
   return this.events.update(id, dto, req.user.id);
 }
 
-  /** Видалення події (тільки організатор) */
+  /** Delete event (only organizer) */
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string, @Req() req: any) {

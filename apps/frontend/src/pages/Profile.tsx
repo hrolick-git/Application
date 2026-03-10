@@ -32,8 +32,6 @@ export function Profile() {
     fetchEvents();
   }, []);
 
-  console.log(events);
-
   // 3. Calculate statistics
   const organizedCount = events.filter(e => e.organizerId === user?.id).length;
   const joinedCount = events.filter(e => {

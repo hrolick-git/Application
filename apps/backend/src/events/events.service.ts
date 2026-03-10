@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma.service';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  /** Список подій для користувача або публічних */
+  /** List events for a user or public events */
   async list(userId?: string) {
     const events = await this.prisma.event.findMany({
       where: {
@@ -15,7 +15,7 @@ export class EventsService {
         ],
       },
       orderBy: { startsAt: 'asc' },
-      include: { participants: true }, // Prisma тягне дані
+      include: { participants: true }, // Prisma get participants for each event to check if the user has joined
     });
 
     return JSON.parse(JSON.stringify(events)).map((e: any) => ({
@@ -24,7 +24,7 @@ export class EventsService {
     }));
   }
 
-  /** Отримати конкретну подію */
+  /** Get a specific event */
   async get(id: string, userId?: string) {
     const event = await this.prisma.event.findUnique({
       where: { id },
@@ -36,36 +36,36 @@ export class EventsService {
       const ok =
         event.organizerId === userId ||
         event.participants.some((p: any) => p.userId === userId);
-      if (!ok) throw new ForbiddenException('Доступ заборонено');
+      if (!ok) throw new ForbiddenException('Access denied');
     }
 
     return event;
   }
 
-  /** Створити подію */
+  /** Create event */
   async create(data: any, userId: string) {
     if (new Date(data.startsAt) < new Date()) {
-      throw new ForbiddenException('Не можна створити подію у минулому');
+      throw new ForbiddenException('Cannot create an event in the past');
     }
     return this.prisma.event.create({ 
       data: { ...data, organizerId: userId },
-      include: { participants: true } // ДОДАЄМО ТУТ
+      include: { participants: true }
     });
   }
 
-  /** Редагувати */
+  /** Update event */
   async update(id: string, data: any, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id } });
-    if (!event) throw new NotFoundException('Подія не знайдена');
-    if (event.organizerId !== userId) throw new ForbiddenException('Доступ заборонено');
+    if (!event) throw new NotFoundException('Event not found');
+    if (event.organizerId !== userId) throw new ForbiddenException('Access denied');
     return this.prisma.event.update({ where: { id }, data });
   }
 
-  /** Видалити */
+  /** Delete event */
   async delete(id: string, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id } });
-    if (!event) throw new NotFoundException('Подія не знайдена');
-    if (event.organizerId !== userId) throw new ForbiddenException('Доступ заборонено');
+    if (!event) throw new NotFoundException('Event not found');
+    if (event.organizerId !== userId) throw new ForbiddenException('Access denied');
     return this.prisma.event.delete({ where: { id } });
   }
 
@@ -75,9 +75,9 @@ export class EventsService {
       where: { id },
       include: { participants: true },
     });
-    if (!event) throw new NotFoundException('Подія не знайдена');
+    if (!event) throw new NotFoundException('Event not found');
     if (event.capacity && event.participants.length >= event.capacity) {
-      throw new ForbiddenException('Подія заповнена');
+      throw new ForbiddenException('Event is full');
     }
     if (event.participants.some(p => p.userId === userId)) return event;
     return this.prisma.participant.create({ data: { eventId: id, userId } });
@@ -90,18 +90,18 @@ export class EventsService {
     });
   }
 
-  /** Публічні події */
+  /** Public events */
   async findPublicEvents() {
     const events = await this.prisma.event.findMany({
       where: { visibility: 'PUBLIC' },
       orderBy: { startsAt: 'asc' },
-      include: { participants: true }, // ОБОВ'ЯЗКОВО ДОДАЄМО ТУТ
+      include: { participants: true },
     });
 
     return JSON.parse(JSON.stringify(events));
   }
 
-  /** Отримати подію без авторизації */
+  /** Get event by ID without authentication */
   async findById(id: string) {
     return this.prisma.event.findUnique({
       where: { id },
