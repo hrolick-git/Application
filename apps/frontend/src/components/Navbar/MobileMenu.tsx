@@ -34,7 +34,7 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
       </div>
 
       <div className="flex flex-col space-y-4 overflow-y-auto">
-        {/* Контент тепер буде на 100% білому фоні */}
+        {/* Web Content will now be on 100% white background */}
         <Link to="/events" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl">
           <TicketIcon className="w-6 h-6 text-indigo-600" />
           <span className="font-bold">Explore</span>
@@ -42,7 +42,7 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
 
         {user ? (
             <>
-            {/* Лінки для авторизованих користувачів */}
+            {/* Link for authenticated users */}
             <Link to="/my-events" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl font-bold text-slate-700">
                 <CalendarIcon className="w-6 h-6 text-indigo-600" />
                 <span>My Schedule</span>
@@ -53,9 +53,9 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
                 <span>Create Event</span>
             </Link>
 
-            {/* Секція профілю та налаштувань */}
+            {/* Section for profile and settings */}
             <div className="mt-4 pt-4 border-t border-slate-100 space-y-1">
-                <Link to="/profile" onClick={onClose} className="flex items-center space-x-3 p-4 text-slate-600 hover:bg-slate-50 rounded-xl">
+                <Link to="/profile" onClick={onClose} className="flex items-center space-x-3 p-4 teкпxt-slate-600 hover:bg-slate-50 rounded-xl">
                 <UserCircleIcon className="w-6 h-6 text-slate-400" />
                 <span className="font-medium">Account Profile</span>
                 </Link>
@@ -75,7 +75,7 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
             </div>
             </>
         ) : (
-            /* Кнопки для тих, хто не ввійшов */
+            /* Button for unauthenticated users */
             <div className="mt-6 space-y-3">
             <Link to="/login" onClick={onClose} className="block w-full py-4 bg-indigo-600 text-white text-center font-bold rounded-2xl shadow-lg shadow-indigo-100">
                 Sign In

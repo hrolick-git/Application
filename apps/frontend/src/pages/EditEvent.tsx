@@ -73,7 +73,7 @@ export function EditEvent() {
   return (
     <div className="bg-slate-50/30 py-12 px-4">
       <div className="max-w-xl mx-auto">
-        {/* Кнопка "Назад" */}
+        {/* Back button */}
         <button 
           onClick={() => navigate(-1)}
           className="flex items-center text-slate-500 hover:text-slate-800 mb-6 transition-colors font-medium"
@@ -94,7 +94,7 @@ export function EditEvent() {
               </div>
             </div>
 
-            {/* Сама форма */}
+            {/* Event Form */}
             <EventForm 
               initialData={initialData} 
               onSubmit={handleUpdate} 

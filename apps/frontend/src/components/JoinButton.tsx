@@ -4,13 +4,13 @@ import { useStore } from '../store/useStore';
 interface JoinButtonProps {
   event: any;
   onRefresh: () => void;
-  className?: string; // для гнучкості розмірів (наприклад, висота на сторінці деталей)
+  className?: string; // for additional styling if needed
 }
 
 export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps) {
   const user = useStore((s) => s.user);
 
-  // Логіка визначення статусу
+  // State checks
   const isPrivate = event.visibility === 'PRIVATE';
   const isJoined = !!user && (
     event.joined || 
@@ -21,7 +21,7 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
   const isFull = event.capacity ? event.participants?.length >= event.capacity : false;
 
   const handleToggle = async (e: React.MouseEvent) => {
-    e.preventDefault(); // щоб не спрацював Link, якщо кнопка всередині картки
+    e.preventDefault(); // if this button is inside a Link, prevent navigation
     
     const token = localStorage.getItem('token');
     if (!token) return alert('You must be logged in to join an event');
@@ -32,7 +32,7 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
       } else {
         await api.post(`/events/${event.id}/join`);
       }
-      onRefresh(); // викликаємо оновлення даних у батьківському компоненті
+      onRefresh(); // call to refresh data in the parent component
     } catch (err: any) {
       console.error(err);
       alert(err.response?.data?.message || 'Action failed');

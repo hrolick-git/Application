@@ -13,20 +13,20 @@ export function Login() {
     try {
       const res = await api.post('/auth/login', data);
 
-      // 1. Зберігаємо токен (щоб працювали наступні запити до API)
+      // 1. Save the token (so subsequent requests to the API will work)
       const token = res.data.access_token;
       localStorage.setItem('token', token);
 
-      // 2. ОНОВЛЮЄМО ZUSTAND (Це те, чого не вистачало!)
-      // Витягуємо функцію setUser зі стору
+      // 2. Update the ZUSTAND store (this is what was missing!)
+      // Extract the setUser function from the store
       const setUser = useStore.getState().setUser;
       
-      // Беремо юзера з відповіді бекенду. 
-      // Якщо бекенд ще не оновлено, використовуємо fallback (тимчасове рішення)
+      // Take the user from the backend response.
+      // If the backend is not updated yet, we use a fallback (temporary solution)
       const userData = res.data.user || { email: data.email, id: 'temp-id' };
       setUser(userData);
 
-      // 3. Тепер редирект
+      // 3. Redirect to the events page
       navigate('/events');
     } catch (err: any) {
       alert(err.response?.data?.message || 'Login failed');

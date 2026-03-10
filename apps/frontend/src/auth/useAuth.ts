@@ -16,7 +16,7 @@ export function useAuth() {
 
   const register = async (email: string, password: string) => {
     await api.post("/auth/register", { email, password });
-    await login(email, password); // після реєстрації логін
+    await login(email, password); // after registration, login
   };
 
   const logout = () => {

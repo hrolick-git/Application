@@ -28,12 +28,12 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center">
-          {/* Десктопне меню (тільки для широких екранів) */}
+          {/* Desktop Menu (only for wide screens) */}
           <div className="hidden md:block">
             <UserMenu user={user} onLogout={handleLogout} />
           </div>
 
-          {/* Кнопка бургера ТЕПЕР ВИДИМА ЗАВЖДИ на мобілках */}
+          {/* Burger Button - NOW VISIBLE ALL THE TIME ON MOBILE DEVICES */}
           <button 
             onClick={() => setIsMenuOpen(true)}
             className="md:hidden p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
@@ -45,7 +45,7 @@ export function Navbar() {
     </nav>
       {isMenuOpen && (
         <>
-          {/* Напівпрозора підкладка, що розмиває фон */}
+          {/* Semi-transparent overlay that blurs the background */}
           <div 
             className="fixed inset-0 z-[90] bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
             onClick={() => setIsMenuOpen(false)}

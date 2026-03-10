@@ -11,7 +11,7 @@ export function Settings() {
   const { user, setUser } = useStore();
   const [name, setName] = useState(user?.name || '');
 
-  // Функція для імітації збереження
+  // For now, this is just a visual demo. The handleSave function simulates saving the settings.
   const handleSave = () => {
     if (user) {
       setUser({ ...user, name });

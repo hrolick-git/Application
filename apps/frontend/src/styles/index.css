@@ -20,7 +20,6 @@ body {
   border-color: #9333ea !important;
 }
 
-/* Наприклад, у твоїх стилях */
 .fc-event.event-public {
   @apply bg-indigo-600 border-none rounded-lg p-0.5;
 }
@@ -30,7 +29,7 @@ body {
 }
 
 @layer components {
-  /* Стиль для самої сітки */
+  /* Calendar Grid Style */
   .fc-theme-standard .fc-scrollgrid {
     @apply border-none !important;
   }
@@ -39,17 +38,17 @@ body {
     @apply border-slate-100 !important;
   }
 
-  /* Назви днів тижня (Пн, Вт...) */
+  /* Title day of the week */
   .fc .fc-col-header-cell-cushion {
     @apply text-slate-400 font-bold text-xs uppercase tracking-wider py-3 !important;
   }
 
-  /* Числа місяця */
+  /* Numbers of the month */
   .fc .fc-daygrid-day-number {
     @apply text-slate-600 font-medium p-3 !important;
   }
 
-  /* СТИЛЬ ПОДІЙ (як на вашому скрині, але краще) */
+  /* EVENT STYLE (as on your screen, but better) */
   .fc-v-event, .fc-h-event {
     @apply border-none rounded-lg px-2 py-1 shadow-sm !important;
   }
@@ -62,29 +61,29 @@ body {
     @apply opacity-80 font-medium text-[10px] mr-1 !important;
   }
 
-  /* Сьогоднішній день */
+  /* Today's date */
   .fc .fc-day-today {
     @apply bg-indigo-50/30 !important;
   }
 
-  /* Кнопки FullCalendar (якщо не робили свої) */
+  /* Button FullCalendar */
   .fc .fc-button-primary {
     @apply bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 focus:ring-2 focus:ring-indigo-500 transition-all !important;
   }
 }
 
-/* Закруглення для всього календаря */
+/* Rounded Corners */
 .fc {
   border: none !important;
   font-family: inherit;
 }
 
-/* Закруглення самих комірок (днів) */
+/* Rounded Corners for block of the days */
 .fc-theme-standard td, .fc-theme-standard th {
-  border: 1px solid #f1f5f9 !important; /* Дуже світлий колір сітки (slate-100) */
+  border: 1px solid #f1f5f9 !important;
 }
 
-/* Робимо заголовки днів (Пн, Вт...) стильними */
+/* Title of the days */
 .fc-col-header-cell {
   padding: 12px 0 !important;
   font-weight: 800 !important;
@@ -94,9 +93,9 @@ body {
   color: #64748b; /* slate-500 */
 }
 
-/* Головна фішка: закруглення івентів */
+/* Ivents */
 .fc-event {
-  border-radius: 8px !important; /* М'які кути для івентів */
+  border-radius: 8px !important; /* Soft cornerss */
   margin: 2px 4px !important;
   border: none !important;
   transition: transform 0.2s ease !important;
@@ -107,17 +106,17 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Ховаємо точки (dots) та робимо івенти плашками */
+/* Hide dots */
 .fc-daygrid-event-dot {
   display: none !important;
 }
 
-/* Сьогоднішній день */
+/* Today's date */
 .fc-day-today {
-  background: #f8fafc !important; /* Легкий фон для сьогодні (slate-50) */
+  background: #f8fafc !important; /* Light background for today (slate-50) */
 }
 
-/* Кнопки навігації (Prev, Next, Today) */
+/* Navigation buttons (Prev, Next, Today) */
 .fc-button {
   background: white !important;
   border: 1px solid #e2e8f0 !important;
@@ -135,20 +134,20 @@ body {
   color: #4f46e5 !important;
 }
 
-/* Адаптація календаря для мобільних пристроїв */
+/* Adaptation for mobile devices */
 @media (max-width: 640px) {
   .fc .fc-toolbar {
-    flex-direction: column; /* Ставимо заголовок над кнопками */
+    flex-direction: column; /* Title under buttons */
     gap: 0.5rem;
   }
 
   .fc .fc-toolbar-title {
-    font-size: 1.25rem !important; /* Зменшуємо шрифт заголовка */
+    font-size: 1.25rem !important; /* Reduse the size of the title */
     font-weight: 800;
   }
 
   .fc .fc-button {
-    padding: 0.4rem 0.6rem !important; /* Робимо кнопки трохи меншими */
+    padding: 0.4rem 0.6rem !important; /* Reduse the size of the buttons */
     font-size: 0.875rem !important;
   }
 }

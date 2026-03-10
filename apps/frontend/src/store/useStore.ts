@@ -20,9 +20,9 @@ interface Event {
 
 interface State {
   user: User | null;
-  events: Event[]; // Додали сюди
+  events: Event[];
   setUser: (user: User | null) => void;
-  setEvents: (events: Event[]) => void; // Додали метод для оновлення
+  setEvents: (events: Event[]) => void;
   logout: () => void;
 }
 
@@ -30,11 +30,11 @@ export const useStore = create<State>()(
   persist(
     (set) => ({
       user: null,
-      events: [], // Ініціалізуємо порожнім масивом
+      events: [],
       setUser: (user) => set({ user }),
-      setEvents: (events) => set({ events }), // Реалізація методу
+      setEvents: (events) => set({ events }),
       logout: () => {
-        set({ user: null, events: [] }); // При логауті чистимо все
+        set({ user: null, events: [] });
         localStorage.removeItem('token');
       },
     }),

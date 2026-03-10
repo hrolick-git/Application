@@ -3,10 +3,9 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { UserIcon, CheckIcon } from "@heroicons/react/24/solid";
-import tippy from 'tippy.js'; // Імпортуємо саму бібліотеку
-import 'tippy.js/dist/tippy.css'; // Імпортуємо стандартні стилі
-import 'tippy.js/animations/shift-away.css'; // Додамо приємну анімацію
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/animations/shift-away.css';
 
 type Props = {
   events: any[];
@@ -30,7 +29,7 @@ export function CalendarView({ events, initialDate, eventClick }: Props) {
       locale="en"
       eventClick={eventClick}
       
-      // Налаштування Тултіпа
+      // Show tooltip on event hover using tippy.js
       eventDidMount={(info) => {
         const description = info.event.extendedProps.description;
         if (description) {
@@ -38,21 +37,21 @@ export function CalendarView({ events, initialDate, eventClick }: Props) {
             content: description,
             placement: 'top',
             animation: 'shift-away',
-            theme: 'light-border', // Можна налаштувати свій стиль у CSS
+            theme: 'light-border',
             allowHTML: true,
           });
         }
       }}
 
-      // Твій попередній код кастомізації контенту
+      // Previous code for customizing event content
       eventContent={(eventInfo) => {
         return (
           <div className="flex items-center space-x-1.5 px-2 h-full overflow-hidden text-white">
-            {/* Час початку */}
+            {/* Start time */}
             <span className="text-[10px] font-medium opacity-85 shrink-0">
               {eventInfo.timeText}
             </span>
-            {/* Назва івенту */}
+            {/* Event name */}
             <span className="truncate text-[11px] font-bold uppercase tracking-tight">
               {eventInfo.event.title}
             </span>
@@ -66,10 +65,10 @@ export function CalendarView({ events, initialDate, eventClick }: Props) {
         const classes = ["cursor-pointer", "transition-all", "rounded-md", "border-none", "py-0.5", "shadow-sm"];
         
         if (isCreator) {
-          // Фіолетовий для твоїх івентів (насичений, але чистий)
+          // Purple for events you created
           classes.push("bg-violet-600 hover:bg-violet-700");
         } else {
-          // Зелений для тих, куди ти йдеш
+          // Green for events you are attending but did not create
           classes.push("bg-emerald-500 hover:bg-emerald-600");
         }
         
