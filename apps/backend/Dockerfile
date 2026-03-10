@@ -19,4 +19,4 @@ RUN npx tsc --project tsconfig.json && ls -la dist/
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "ls -la /app/dist/ && npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
+CMD ["sh", "-c", "ls -la /app/dist/src/ && npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/src/main.js"]
