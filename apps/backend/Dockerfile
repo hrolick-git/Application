@@ -10,15 +10,13 @@ ENV PRISMA_CLIENT_ENGINE_TYPE=library
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
 RUN npm run build
-
-RUN npm prune --production --legacy-peer-deps
 
 EXPOSE 4000
 
