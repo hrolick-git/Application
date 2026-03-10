@@ -15,7 +15,7 @@ COPY . .
 
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
-RUN npm run build
+RUN npx tsc --project tsconfig.json && ls -la dist/
 
 EXPOSE 4000
 
