@@ -10,7 +10,7 @@ ENV PRISMA_CLIENT_ENGINE_TYPE=library
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
