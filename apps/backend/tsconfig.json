@@ -9,8 +9,9 @@
     "target": "ES2019",
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": "./",
-    "incremental": false,
+    "incremental": true,
     "skipLibCheck": true,
     "strict": true
   },

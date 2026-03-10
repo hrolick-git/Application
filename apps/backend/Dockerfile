@@ -1,6 +1,5 @@
 FROM node:20-bullseye-slim
 WORKDIR /app
-ARG CACHE_BUST=1
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV PRISMA_CLI_QUERY_ENGINE_TYPE=library
@@ -15,8 +14,8 @@ COPY . .
 
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
-RUN npx tsc --project tsconfig.json && ls -la dist/
+RUN npx tsc --project tsconfig.json
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "ls -la /app/dist/src/ && npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
