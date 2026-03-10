@@ -1,7 +1,5 @@
 FROM node:20-bullseye-slim
-
 WORKDIR /app
-
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV PRISMA_CLI_QUERY_ENGINE_TYPE=library
