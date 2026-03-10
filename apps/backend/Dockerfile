@@ -22,4 +22,4 @@ RUN npm prune --production --legacy-peer-deps
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
