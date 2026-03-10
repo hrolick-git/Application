@@ -5,12 +5,12 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 ENV PRISMA_CLI_QUERY_ENGINE_TYPE=library
 ENV PRISMA_CLIENT_ENGINE_TYPE=library
 
-COPY package*.json ./
-COPY prisma ./prisma/
+COPY apps/backend/package*.json ./
+COPY apps/backend/prisma ./prisma/
 
 RUN npm install --legacy-peer-deps
 
-COPY . .
+COPY apps/backend . 
 
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
