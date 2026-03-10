@@ -2,30 +2,32 @@ FROM node:20-bullseye-slim
 
 WORKDIR /app
 
-# Встановлюємо системні залежності для Prisma
+# Системні залежності
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Копіюємо конфіги з поточної директорії (apps/backend)
-COPY package*.json ./
-COPY prisma ./prisma/
+# Це прибере помилку з WASM, примусово ввімкнувши бібліотеку
+ENV PRISMA_CLI_QUERY_ENGINE_TYPE=library
+ENV PRISMA_CLIENT_ENGINE_TYPE=library
 
-# Встановлюємо залежності
+# Копіюємо ТІЛЬКИ файли залежностей та схему
+COPY apps/backend/package*.json ./
+COPY apps/backend/prisma ./prisma/
+
+# Встановлюємо ПРІЗМУ ЯВНО перед усім іншим
+RUN npm install prisma@6.4.1 @prisma/client@6.4.1 --legacy-peer-deps
+
+# Тепер решта залежностей
 RUN npm install --legacy-peer-deps
 
-# Копіюємо решту коду бекенду
-COPY . .
+# ГЕНЕРУЄМО КЛІЄНТ (тепер Прізма точно знайде свої модулі)
+RUN ./node_modules/.bin/prisma generate --schema ./prisma/schema.prisma
 
-# Генеруємо клієнт
-RUN npx prisma generate --schema ./prisma/schema.prisma
+# Копіюємо код
+COPY apps/backend/ .
 
-# Збірка проекту
+# Цей варіант просто збирає проект, ігноруючи помилки діагностики TS
 RUN npm run build
-
-# Видаляємо зайве для економії пам'яті
-RUN npm prune --production --legacy-peer-deps
 
 EXPOSE 4000
 
-# Команда запуску: ТУТ МИ МІНЯЄМО ШЛЯХ ДО СХЕМИ
-# В кінці вашого Dockerfile
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
