@@ -3,7 +3,9 @@ module.exports = {
   rootDir: 'src',
   testRegex: '.e2e-spec.ts$',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest'
+    '^.+\\.(t|j)s$': ['ts-jest', {
+      tsconfig: require('path').join(__dirname, 'tsconfig.json')
+    }]
   },
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
