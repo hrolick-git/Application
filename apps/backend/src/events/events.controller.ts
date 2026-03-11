@@ -70,15 +70,15 @@ export class EventsController {
   }
 
   /** Update event (only organizer) */
-@UseGuards(JwtAuthGuard)
-@Patch(':id')
-async update(
-  @Param('id') id: string,
-  @Body(new ValidationPipe(updateEventSchema)) dto: UpdateEventDto, // ДОДАЙТЕ СЮДИ
-  @Req() req: any,
-) {
-  return this.events.update(id, dto, req.user.id);
-}
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body(new ValidationPipe(updateEventSchema)) dto: UpdateEventDto, // ДОДАЙТЕ СЮДИ
+    @Req() req: any,
+  ) {
+    return this.events.update(id, dto, req.user.id);
+  }
 
   /** Delete event (only organizer) */
   @UseGuards(JwtAuthGuard)

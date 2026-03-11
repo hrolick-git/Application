@@ -23,7 +23,7 @@ export function EditEvent() {
           capacity: event.capacity ?? '',
         });
       } catch (err) {
-        setError('Не вдалося завантажити дані події');
+        setError('Failed to load event data');
       }
     };
     fetchEvent();
@@ -52,15 +52,15 @@ export function EditEvent() {
       await api.patch(`/events/${id}`, payload);
       navigate(`/events/${id}`);
     } catch (err: any) {
-      console.error("Деталі помилки:", err.response?.data);
-      alert(err.response?.data?.message || "Помилка оновлення");
+      console.error("Error updating event:", err.response?.data);
+      alert(err.response?.data?.message || "Error updating event");
     }
   };
 
   if (error) return (
     <div className="text-center mt-20">
       <p className="text-red-500 font-medium">{error}</p>
-      <button onClick={() => navigate(-1)} className="mt-4 text-indigo-600 hover:underline">Повернутися назад</button>
+      <button onClick={() => navigate(-1)} className="mt-4 text-indigo-600 hover:underline">Back to Event Details</button>
     </div>
   );
 
@@ -79,7 +79,7 @@ export function EditEvent() {
           className="flex items-center text-slate-500 hover:text-slate-800 mb-6 transition-colors font-medium"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
-          Назад до деталей
+          Back to Event Details
         </button>
 
         <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
@@ -89,8 +89,8 @@ export function EditEvent() {
                 <PencilSquareIcon className="w-8 h-8 text-amber-500" />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-800">Редагувати подію</h2>
-                <p className="text-slate-500 text-sm">Внесіть зміни у вашу активність</p>
+                <h2 className="text-2xl font-black text-slate-800">Edit Event</h2>
+                <p className="text-slate-500 text-sm">Make changes to your event</p>
               </div>
             </div>
 
@@ -98,7 +98,7 @@ export function EditEvent() {
             <EventForm 
               initialData={initialData} 
               onSubmit={handleUpdate} 
-              buttonText="Зберегти зміни" 
+              buttonText="Save Changes" 
             />
           </div>
         </div>

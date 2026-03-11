@@ -27,7 +27,7 @@ interface State {
   setUser: (user: User | null) => void;
   setEvents: (events: Event[]) => void;
   logout: () => void;
-  fetchEvents: () => Promise<void>; // Додали функцію завантаження
+  fetchEvents: () => Promise<void>;
 }
 
 export const useStore = create<State>()(
@@ -41,21 +41,17 @@ export const useStore = create<State>()(
         set({ user: null, events: [] });
         localStorage.removeItem('token');
       },
-      // Ця функція тепер сама знає, якого юзера питати
       fetchEvents: async () => {
         const currentUser = get().user;
-        
-        // 1. Використовуємо наш готовий api клієнт (він сам додасть базу: localhost або railway)
-        // 2. Додаємо userId тільки якщо він є
         const url = currentUser?.id 
           ? `/events?userId=${currentUser.id}` 
           : '/events';
 
         try {
-          const res = await api.get(url); // Використовуй 'api' замість 'axios'
+          const res = await api.get(url);
           set({ events: res.data });
         } catch (error) {
-          console.error("Помилка завантаження івентів:", error);
+          console.error("Error fetching events:", error);
         }
       },
     }),
