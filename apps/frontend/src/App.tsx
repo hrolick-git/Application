@@ -90,8 +90,8 @@ export function App() {
             <Route path="*" element={<EventsList />} />
           </Routes>
         </div>
-      </BrowserRouter>
       <AIAssistant />
+      </BrowserRouter>
     </AppInit>
   );
 }
