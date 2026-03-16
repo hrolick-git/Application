@@ -21,7 +21,8 @@ export const updateEventSchema = yup.object({
     .min(1, "Мінімум 1 місце")
     .nullable() 
     .optional(),
-  visibility: yup.string().oneOf(['PUBLIC', 'PRIVATE']).optional()
+  visibility: yup.string().oneOf(['PUBLIC', 'PRIVATE']).optional(),
+  tagIds: yup.array().of(yup.string()).max(5, 'Максимум 5 тегів').optional()
 });
 
 export class UpdateEventDto {
@@ -32,4 +33,5 @@ export class UpdateEventDto {
   location?: string;
   capacity?: number | null; // Added null
   visibility?: 'PUBLIC' | 'PRIVATE';
+  tagIds?: string[];
 }

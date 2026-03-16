@@ -7,7 +7,8 @@ export const createEventSchema = yup.object({
   endsAt: yup.date().nullable().optional(),
   location: yup.string().required("Локація обов'язкова"),
   capacity: yup.number().integer().nullable().optional(),
-  visibility: yup.string().oneOf(['PUBLIC', 'PRIVATE']).default('PUBLIC')
+  visibility: yup.string().oneOf(['PUBLIC', 'PRIVATE']).default('PUBLIC'),
+  tagIds: yup.array().of(yup.string()).max(5, 'Максимум 5 тегів').optional()
 });
 
 export class CreateEventDto {
@@ -18,4 +19,5 @@ export class CreateEventDto {
   location!: string;
   capacity?: number;
   visibility!: 'PUBLIC' | 'PRIVATE';
+  tagIds?: string[];
 }
