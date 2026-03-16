@@ -16,6 +16,10 @@ export class UsersService {
           { organizerId: userId },
           { participants: { some: { userId } } }
         ]
+      },
+      include: {
+        participants: true,
+        tags: { include: { tag: true } }
       }
     });
   }

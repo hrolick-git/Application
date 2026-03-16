@@ -33,6 +33,7 @@ model Event {
   participants Participant[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  tags EventTag[]
 }
 
 model Participant {
@@ -43,6 +44,21 @@ model Participant {
   joinedAt   DateTime @default(now())
 
   @@id([userId, eventId])
+}
+
+model Tag {
+  id     String       @id @default(uuid())
+  name   String       @unique
+  events EventTag[]
+}
+
+model EventTag {
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId String
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId   String
+
+  @@id([eventId, tagId])
 }
 
 enum Visibility {

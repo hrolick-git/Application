@@ -5,30 +5,38 @@ import { PrismaService } from '../prisma.service';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  /** List events for a user or public events */
-  async list(userId?: string) {
+  async list(userId?: string, tagIds?: string[]) {
     const events = await this.prisma.event.findMany({
       where: {
         OR: [
           { visibility: 'PUBLIC' },
           ...(userId ? [{ organizerId: userId }] : []),
         ],
+        ...(tagIds?.length ? {
+          tags: { some: { tagId: { in: tagIds } } }
+        } : {})
       },
       orderBy: { startsAt: 'asc' },
-      include: { participants: true }, // Prisma get participants for each event to check if the user has joined
+      include: {
+        participants: true,
+        tags: { include: { tag: true } }
+      },
     });
 
     return JSON.parse(JSON.stringify(events)).map((e: any) => ({
       ...e,
       joined: userId ? e.participants.some((p: any) => p.userId === userId) : false,
+      tags: e.tags.map((et: any) => et.tag)
     }));
   }
 
-  /** Get a specific event */
   async get(id: string, userId?: string) {
     const event = await this.prisma.event.findUnique({
       where: { id },
-      include: { participants: { include: { user: true } } },
+      include: {
+        participants: { include: { user: true } },
+        tags: { include: { tag: true } }
+      },
     });
     if (!event) throw new NotFoundException('Event not found');
 
@@ -39,29 +47,63 @@ export class EventsService {
       if (!ok) throw new ForbiddenException('Access denied');
     }
 
-    return event;
+    return {
+      ...event,
+      tags: event.tags.map((et: any) => et.tag)
+    };
   }
 
-  /** Create event */
   async create(data: any, userId: string) {
     if (new Date(data.startsAt) < new Date()) {
       throw new ForbiddenException('Cannot create an event in the past');
     }
-    return this.prisma.event.create({ 
-      data: { ...data, organizerId: userId },
-      include: { participants: true }
+
+    const { tagIds, ...eventData } = data;
+
+    return this.prisma.event.create({
+      data: {
+        ...eventData,
+        organizerId: userId,
+        ...(tagIds?.length ? {
+          tags: {
+            create: tagIds.map((tagId: string) => ({ tagId }))
+          }
+        } : {})
+      },
+      include: {
+        participants: true,
+        tags: { include: { tag: true } }
+      }
     });
   }
 
-  /** Update event */
   async update(id: string, data: any, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id } });
     if (!event) throw new NotFoundException('Event not found');
     if (event.organizerId !== userId) throw new ForbiddenException('Access denied');
-    return this.prisma.event.update({ where: { id }, data });
+
+    const { tagIds, ...eventData } = data;
+
+    if (tagIds !== undefined) {
+      // видалити старі теги і додати нові
+      await this.prisma.eventTag.deleteMany({ where: { eventId: id } });
+      if (tagIds.length > 0) {
+        await this.prisma.eventTag.createMany({
+          data: tagIds.map((tagId: string) => ({ eventId: id, tagId }))
+        });
+      }
+    }
+
+    return this.prisma.event.update({
+      where: { id },
+      data: eventData,
+      include: {
+        participants: true,
+        tags: { include: { tag: true } }
+      }
+    });
   }
 
-  /** Delete event */
   async delete(id: string, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id } });
     if (!event) throw new NotFoundException('Event not found');
@@ -69,7 +111,6 @@ export class EventsService {
     return this.prisma.event.delete({ where: { id } });
   }
 
-  /** Join */
   async join(id: string, userId: string) {
     const event = await this.prisma.event.findUnique({
       where: { id },
@@ -83,35 +124,54 @@ export class EventsService {
     return this.prisma.participant.create({ data: { eventId: id, userId } });
   }
 
-  /** Leave */
   async leave(id: string, userId: string) {
     return this.prisma.participant.delete({
       where: { userId_eventId: { userId, eventId: id } },
     });
   }
 
-  /** Public events */
-  async findPublicEvents() {
+  async findPublicEvents(tagIds?: string[]) {
     const events = await this.prisma.event.findMany({
-      where: { visibility: 'PUBLIC' },
+      where: {
+        visibility: 'PUBLIC',
+        ...(tagIds?.length ? {
+          tags: { some: { tagId: { in: tagIds } } }
+        } : {})
+      },
       orderBy: { startsAt: 'asc' },
-      include: { participants: true },
+      include: {
+        participants: true,
+        tags: { include: { tag: true } }
+      },
     });
 
-    return JSON.parse(JSON.stringify(events));
+    return JSON.parse(JSON.stringify(events)).map((e: any) => ({
+      ...e,
+      tags: e.tags.map((et: any) => et.tag)
+    }));
   }
 
-  /** Get event by ID without authentication */
   async findById(id: string) {
-    return this.prisma.event.findUnique({
+    const event = await this.prisma.event.findUnique({
       where: { id },
       include: {
         participants: {
           include: {
             user: { select: { email: true, id: true } }
           }
-        }
+        },
+        tags: { include: { tag: true } }
       }
     });
+    if (!event) return null;
+    return {
+      ...event,
+      tags: event.tags.map((et: any) => et.tag)
+    };
+  }
+
+  /** Get all available tags */
+  async getTags() {
+    return this.prisma.tag.findMany({ orderBy: { name: 'asc' } });
   }
 }

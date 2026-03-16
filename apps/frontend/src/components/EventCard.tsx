@@ -2,15 +2,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import { PencilSquareIcon, MapPinIcon, CalendarDaysIcon, UsersIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { JoinButton } from './JoinButton';
 
+interface Tag {
+  id: string;
+  name: string;
+}
+
 interface EventCardProps {
   event: any;
   isOrganizer: boolean;
   onRefresh: () => void;
 }
 
+const TAG_COLORS: Record<string, string> = {
+  Tech:     'bg-blue-100 text-blue-700',
+  Art:      'bg-pink-100 text-pink-700',
+  Business: 'bg-amber-100 text-amber-700',
+  Music:    'bg-purple-100 text-purple-700',
+  Sport:    'bg-green-100 text-green-700',
+  Food:     'bg-orange-100 text-orange-700',
+  Other:    'bg-slate-100 text-slate-600',
+};
+
 export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) {
   const navigate = useNavigate();
   const isPrivate = e.visibility === 'PRIVATE';
+  const tags: Tag[] = e.tags || [];
 
   return (
     <div className={`group relative rounded-[2.5rem] p-7 shadow-sm hover:shadow-2xl transition-all duration-500 border flex flex-col h-full min-h-[340px] ${
@@ -44,6 +60,20 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
           <div className="inline-flex items-center mb-4 px-3 py-1 rounded-full bg-purple-600 text-white shadow-lg shadow-purple-200">
             <LockClosedIcon className="w-3 h-3 mr-1.5" />
             <span className="text-[10px] uppercase tracking-widest font-black">Private Access</span>
+          </div>
+        )}
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {tags.map(tag => (
+              <span
+                key={tag.id}
+                className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${TAG_COLORS[tag.name] || TAG_COLORS['Other']}`}
+              >
+                {tag.name}
+              </span>
+            ))}
           </div>
         )}
 

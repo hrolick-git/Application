@@ -7,26 +7,37 @@ import { EventCard } from '../components/EventCard';
 import { EmptyState } from '../components/EmptyState';
 import { motion, Variants } from 'framer-motion';
 
-// 1. Variants for the container that holds all event cards
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1, // Delay between the appearance of each card
-    },
+    transition: { staggerChildren: 0.1 },
   },
 };
 
-// 2. Variants для окремої картки
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.5, ease: "easeOut" as const } 
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" as const }
   },
 };
+
+const TAG_COLORS: Record<string, string> = {
+  Tech:     'bg-blue-100 text-blue-700 border-blue-200',
+  Art:      'bg-pink-100 text-pink-700 border-pink-200',
+  Business: 'bg-amber-100 text-amber-700 border-amber-200',
+  Music:    'bg-purple-100 text-purple-700 border-purple-200',
+  Sport:    'bg-green-100 text-green-700 border-green-200',
+  Food:     'bg-orange-100 text-orange-700 border-orange-200',
+  Other:    'bg-slate-100 text-slate-600 border-slate-200',
+};
+
+interface Tag {
+  id: string;
+  name: string;
+}
 
 interface Event {
   id: string;
@@ -41,32 +52,37 @@ interface Event {
   full?: boolean;
   visibility?: 'PUBLIC' | 'PRIVATE';
   organizerId: string;
+  tags?: Tag[];
 }
 
 export function EventsList() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const user = useStore((s) => s.user);
 
   const filteredEvents = events.filter((e) => {
     const searchLower = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       e.title.toLowerCase().includes(searchLower) ||
       e.description?.toLowerCase().includes(searchLower) ||
-      e.location?.toLowerCase().includes(searchLower)
-    );
+      e.location?.toLowerCase().includes(searchLower);
+
+    const matchesTags =
+      selectedTagIds.length === 0 ||
+      selectedTagIds.every(tagId => e.tags?.some(t => t.id === tagId));
+
+    return matchesSearch && matchesTags;
   });
 
-  const fetch = async () => {
+  const fetchEvents = async () => {
     try {
       const token = localStorage.getItem('token');
-      let res;
-      if (token) {
-        res = await api.get<Event[]>('/events');
-      } else {
-        res = await api.get<Event[]>('/events/public');
-      }
+      const res = token
+        ? await api.get<Event[]>('/events')
+        : await api.get<Event[]>('/events/public');
       setEvents(res.data);
     } catch (err) {
       console.error(err);
@@ -76,20 +92,27 @@ export function EventsList() {
   };
 
   useEffect(() => {
-    fetch();
+    fetchEvents();
+    api.get('/events/tags').then(res => setAvailableTags(res.data)).catch(() => {});
   }, []);
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds(prev =>
+      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
+    );
+  };
 
   if (loading) return <Loader />;
 
   return (
     <div className="p-6 bg-slate-50/30 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        
-        {/* Animated header */}
-        <motion.header 
+
+        {/* Header */}
+        <motion.header
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6"
+          className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6"
         >
           <div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tight">Explore Events</h1>
@@ -98,9 +121,44 @@ export function EventsList() {
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
         </motion.header>
 
+        {/* Tag Filter */}
+        {availableTags.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-wrap gap-2 mb-8"
+          >
+            {availableTags.map(tag => {
+              const isSelected = selectedTagIds.includes(tag.id);
+              const colorClass = TAG_COLORS[tag.name] || TAG_COLORS['Other'];
+              return (
+                <button
+                  key={tag.id}
+                  onClick={() => toggleTag(tag.id)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                    isSelected
+                      ? `${colorClass} shadow-sm scale-105`
+                      : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  {isSelected && <span className="mr-1">✓</span>}
+                  {tag.name}
+                </button>
+              );
+            })}
+            {selectedTagIds.length > 0 && (
+              <button
+                onClick={() => setSelectedTagIds([])}
+                className="px-4 py-1.5 rounded-full text-sm font-semibold border border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all"
+              >
+                Clear filters
+              </button>
+            )}
+          </motion.div>
+        )}
+
         {filteredEvents.length > 0 ? (
-          /* Container for event cards with stagger effect */
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -108,22 +166,29 @@ export function EventsList() {
           >
             {filteredEvents.map(e => (
               <motion.div key={e.id} variants={cardVariants}>
-                <EventCard 
-                  event={e} 
-                  isOrganizer={user?.id === e.organizerId} 
-                  onRefresh={fetch} 
+                <EventCard
+                  event={e}
+                  isOrganizer={user?.id === e.organizerId}
+                  onRefresh={fetchEvents}
                 />
               </motion.div>
             ))}
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <EmptyState 
-              title="Nothing Found"
-              message={`We couldn't find any events matching "${searchQuery}". Try a different keyword.`}
+            <EmptyState
+              title="No events match the selected tags"
+              message={
+                selectedTagIds.length > 0
+                  ? "No events match the selected tags."
+                  : `We couldn't find any events matching "${searchQuery}".`
+              }
               action={
-                <button onClick={() => setSearchQuery('')} className="btn-secondary">
-                  Clear Search
+                <button
+                  onClick={() => { setSearchQuery(''); setSelectedTagIds([]); }}
+                  className="btn-secondary"
+                >
+                  Clear filters
                 </button>
               }
             />

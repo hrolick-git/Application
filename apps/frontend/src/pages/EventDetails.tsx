@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import { useStore } from '../store/useStore';
 import { Loader } from '../components/Loader';
 import { JoinButton } from '../components/JoinButton';
-import { 
-  MapPinIcon, 
-  CalendarDaysIcon, 
-  UsersIcon, 
+import {
+  MapPinIcon,
+  CalendarDaysIcon,
+  UsersIcon,
   ArrowLeftIcon,
   TrashIcon,
   PencilSquareIcon,
   LockClosedIcon
 } from '@heroicons/react/24/outline';
+
+interface Tag {
+  id: string;
+  name: string;
+}
 
 interface Event {
   id: string;
@@ -27,7 +32,18 @@ interface Event {
   organizerId: string;
   joined?: boolean;
   full?: boolean;
+  tags?: Tag[];
 }
+
+const TAG_COLORS: Record<string, string> = {
+  Tech:     'bg-blue-100 text-blue-700',
+  Art:      'bg-pink-100 text-pink-700',
+  Business: 'bg-amber-100 text-amber-700',
+  Music:    'bg-purple-100 text-purple-700',
+  Sport:    'bg-green-100 text-green-700',
+  Food:     'bg-orange-100 text-orange-700',
+  Other:    'bg-slate-100 text-slate-600',
+};
 
 export function EventDetails() {
   const { id } = useParams();
@@ -59,20 +75,6 @@ export function EventDetails() {
     fetch();
   }, [id]);
 
-  const toggle = async () => {
-    if (!event) return;
-    try {
-      if (event.joined) {
-        await api.post(`/events/${id}/leave`);
-      } else {
-        await api.post(`/events/${id}/join`);
-      }
-      fetch();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Error joining/leaving');
-    }
-  };
-
   const del = async () => {
     if (!event) return;
     if (window.confirm('Are you sure you want to delete this event?')) {
@@ -91,12 +93,13 @@ export function EventDetails() {
   const isOrganizer = event.organizerId === user?.id;
   const isPrivate = event.visibility === 'PRIVATE';
   const participantsList = event.participants || [];
+  const tags = event.tags || [];
 
   return (
     <div className="bg-slate-50/30 p-6">
       <div className="max-w-3xl mx-auto">
         {/* Back button */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center text-slate-500 hover:text-indigo-600 transition-colors font-medium text-sm group"
         >
@@ -122,6 +125,21 @@ export function EventDetails() {
                 }`}>
                   {event.title}
                 </h1>
+
+                {/* Tags */}
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {tags.map(tag => (
+                      <span
+                        key={tag.id}
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${TAG_COLORS[tag.name] || TAG_COLORS['Other']}`}
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <p className="text-lg text-slate-500 leading-relaxed italic">
                   "{event.description || 'No description provided.'}"
                 </p>
@@ -153,7 +171,7 @@ export function EventDetails() {
           <div className="p-8 md:p-12 grid md:grid-cols-2 gap-10">
             <div className="space-y-6">
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Event Info</h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
                   <div className={`p-3 rounded-xl mr-4 ${isPrivate ? 'bg-purple-100 text-purple-600' : 'bg-indigo-100 text-indigo-600'}`}>
@@ -168,7 +186,7 @@ export function EventDetails() {
                 </div>
 
                 <div className="flex items-center p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
-                  <div className={`p-3 rounded-xl mr-4 ${isPrivate ? 'bg-rose-100 text-rose-600' : 'bg-rose-100 text-rose-600'}`}>
+                  <div className="p-3 rounded-xl mr-4 bg-rose-100 text-rose-600">
                     <MapPinIcon className="w-6 h-6" />
                   </div>
                   <div>
@@ -178,7 +196,7 @@ export function EventDetails() {
                 </div>
 
                 <div className="flex items-center p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
-                  <div className={`p-3 rounded-xl mr-4 ${isPrivate ? 'bg-emerald-100 text-emerald-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                  <div className="p-3 rounded-xl mr-4 bg-emerald-100 text-emerald-600">
                     <UsersIcon className="w-6 h-6" />
                   </div>
                   <div>
@@ -211,12 +229,11 @@ export function EventDetails() {
                 )}
               </div>
 
-              {/* Join Button */}
               <div className="mt-8">
-                <JoinButton 
-                  event={event} 
-                  onRefresh={fetch} 
-                  className="py-5 text-lg" // make the button larger for the details page
+                <JoinButton
+                  event={event}
+                  onRefresh={fetch}
+                  className="py-5 text-lg"
                 />
               </div>
             </div>

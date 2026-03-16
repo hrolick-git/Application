@@ -37,6 +37,7 @@ export function EditEvent() {
         location: formData.location,
         visibility: formData.visibility,
         startsAt: new Date(formData.startsAt).toISOString(),
+        tagIds: formData.tagIds || [],  // ← додай це
       };
 
       if (formData.endsAt) {

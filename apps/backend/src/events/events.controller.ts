@@ -37,10 +37,16 @@ export class EventsController {
     const event = await this.events.findById(id);
 
     if (!event || event.visibility !== 'PUBLIC') {
-      throw new NotFoundException('Подія не знайдена');
+      throw new NotFoundException('Event not found');
     }
 
     return event;
+  }
+
+  /** Get all tags */
+  @Get('tags')
+  async getTags() {
+    return this.events.getTags();
   }
 
   /* =======================
