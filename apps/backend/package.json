@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node dist/main",
-    "start:dev": "nest start --watch",
+    "start": "node dist/src/main",
+    "start:dev": "dotenv -e .env.local -- nodemon --exec ts-node -r tsconfig-paths/register --transpile-only src/main.ts --ext ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
