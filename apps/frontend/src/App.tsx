@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
+import { AIAssistant } from './components/AIAssistant';
 import { Login } from "./pages/Login";
 import { MyEvents } from "./pages/MyEvents";
 import { EventsList } from "./pages/EventsList";
@@ -90,6 +91,7 @@ export function App() {
           </Routes>
         </div>
       </BrowserRouter>
+      <AIAssistant />
     </AppInit>
   );
 }
