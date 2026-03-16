@@ -39,7 +39,7 @@ const handleRegister = async (data: any) => {
 };
 
   return (
-    <div className="flex items-center justify-center bg-slate-50 p-6">
+    <div className="flex items-center justify-center bg-slate-50 p-6 min-h-[calc(100vh-70px)]">
       <div className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-100 border border-slate-100">
         <h1 className="text-4xl font-black text-slate-900 mb-2">Join us! 🚀</h1>
         <p className="text-slate-500 mb-10 font-medium">Create your account to start exploring events.</p>
