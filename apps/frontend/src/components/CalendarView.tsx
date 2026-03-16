@@ -68,25 +68,21 @@ export function CalendarView({ events, initialDate, eventClick }: Props) {
         );
       }}
 
-      eventClassNames={(arg) => {
-        const { isCreator, tags } = arg.event.extendedProps;
-        const classes = ["cursor-pointer", "transition-all", "rounded-md", "border-none", "py-0.5", "shadow-sm"];
+    eventClassNames={(arg) => {
+      const { tags } = arg.event.extendedProps;
+      const classes = ["cursor-pointer", "transition-all", "rounded-md", "border-none", "py-0.5", "shadow-sm"];
 
-        // If event has tags — color by first tag
-        const firstTag = tags?.[0]?.name;
-        if (firstTag && TAG_CALENDAR_COLORS[firstTag]) {
-          const { bg, hover } = TAG_CALENDAR_COLORS[firstTag];
-          classes.push(bg, hover);
-        } else if (isCreator) {
-          // Fallback: purple for events you created
-          classes.push("bg-violet-600", "hover:bg-violet-700");
-        } else {
-          // Fallback: green for events you attend
-          classes.push("bg-emerald-500", "hover:bg-emerald-600");
-        }
+      const firstTag = tags?.[0]?.name;
+      if (firstTag && TAG_CALENDAR_COLORS[firstTag]) {
+        const { bg, hover } = TAG_CALENDAR_COLORS[firstTag];
+        classes.push(bg, hover);
+      } else {
+        // Default color if no tags
+        classes.push("bg-indigo-500", "hover:bg-indigo-600");
+      }
 
-        return classes;
-      }}
+      return classes;
+    }}
     />
   );
 }

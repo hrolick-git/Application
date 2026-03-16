@@ -40,7 +40,7 @@ export function MyEvents() {
             description: e.description,
             isCreator: e.organizerId === user?.id,
             isAttending: true,
-            tags: e.tags || [],
+            tags: e.tags?.map((et: any) => et.tag) || [],
           },
         }));
 
