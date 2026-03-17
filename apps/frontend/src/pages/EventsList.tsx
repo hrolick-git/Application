@@ -59,8 +59,10 @@ export function EventsList() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const tags = useStore((s) => s.tags);
+  const selectedTags = useStore((s) => s.selectedTags);
+  const setSelectedTags = useStore((s) => s.setSelectedTags);
+  const fetchTags = useStore((s) => s.fetchTags);
   const user = useStore((s) => s.user);
 
   const filteredEvents = events.filter((e) => {
@@ -71,8 +73,8 @@ export function EventsList() {
       e.location?.toLowerCase().includes(searchLower);
 
     const matchesTags =
-      selectedTagIds.length === 0 ||
-      selectedTagIds.every(tagId => e.tags?.some(t => t.id === tagId));
+      selectedTags.length === 0 ||
+      selectedTags.every(tagId => e.tags?.some(t => t.id === tagId));
 
     return matchesSearch && matchesTags;
   });
@@ -93,13 +95,14 @@ export function EventsList() {
 
   useEffect(() => {
     fetchEvents();
-    api.get('/events/tags').then(res => setAvailableTags(res.data)).catch(() => {});
+    fetchTags();
   }, []);
 
   const toggleTag = (tagId: string) => {
-    setSelectedTagIds(prev =>
-      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
-    );
+    const next = selectedTags.includes(tagId)
+      ? selectedTags.filter(id => id !== tagId)
+      : [...selectedTags, tagId];
+    setSelectedTags(next);
   };
 
   if (loading) return <Loader />;
@@ -122,14 +125,14 @@ export function EventsList() {
         </motion.header>
 
         {/* Tag Filter */}
-        {availableTags.length > 0 && (
+        {tags.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-wrap gap-2 mb-8"
           >
-            {availableTags.map(tag => {
-              const isSelected = selectedTagIds.includes(tag.id);
+            {tags.map(tag => {
+              const isSelected = selectedTags.includes(tag.id);
               const colorClass = TAG_COLORS[tag.name] || TAG_COLORS['Other'];
               return (
                 <button
@@ -146,9 +149,9 @@ export function EventsList() {
                 </button>
               );
             })}
-            {selectedTagIds.length > 0 && (
+            {selectedTags.length > 0 && (
               <button
-                onClick={() => setSelectedTagIds([])}
+                onClick={() => setSelectedTags([])}
                 className="px-4 py-1.5 rounded-full text-sm font-semibold border border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all"
               >
                 Clear filters
@@ -179,13 +182,13 @@ export function EventsList() {
             <EmptyState
               title="No events match the selected tags"
               message={
-                selectedTagIds.length > 0
+                selectedTags.length > 0
                   ? "No events match the selected tags."
                   : `We couldn't find any events matching "${searchQuery}".`
               }
               action={
                 <button
-                  onClick={() => { setSearchQuery(''); setSelectedTagIds([]); }}
+                  onClick={() => { setSearchQuery(''); setSelectedTags([]); }}
                   className="btn-secondary"
                 >
                   Clear filters

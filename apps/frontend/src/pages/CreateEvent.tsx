@@ -2,6 +2,7 @@ import api from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import { EventForm } from '../components/EventForm';
 import { PlusIcon, ArrowLeftIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-hot-toast';
 
 export function CreateEvent() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export function CreateEvent() {
     } catch (err: any) {
       console.error("❌ Backend Error:", err.response?.data);
       const msg = err.response?.data?.message;
-      alert(Array.isArray(msg) ? msg.join(', ') : msg || 'Creation failed');
+      toast.error(Array.isArray(msg) ? msg.join(', ') : msg || 'Creation failed');
     }
   };
 

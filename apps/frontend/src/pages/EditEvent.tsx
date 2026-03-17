@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import { EventForm } from '../components/EventForm';
 import { PencilSquareIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-hot-toast';
 
 export function EditEvent() {
   const { id } = useParams();
@@ -54,7 +55,7 @@ export function EditEvent() {
       navigate(`/events/${id}`);
     } catch (err: any) {
       console.error("Error updating event:", err.response?.data);
-      alert(err.response?.data?.message || "Error updating event");
+      toast.error(err.response?.data?.message || "Error updating event");
     }
   };
 

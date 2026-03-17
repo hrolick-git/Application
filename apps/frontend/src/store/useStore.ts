@@ -8,6 +8,11 @@ interface User {
   name?: string;
 }
 
+interface Tag {
+  id: string;
+  name: string;
+}
+
 interface Event {
   id: string;
   title: string;
@@ -19,15 +24,20 @@ interface Event {
   participants: any[];
   joined?: boolean;
   full?: boolean;
+  tags?: Tag[];
 }
 
 interface State {
   user: User | null;
   events: Event[];
+  tags: Tag[];
+  selectedTags: string[];
   setUser: (user: User | null) => void;
   setEvents: (events: Event[]) => void;
+  setSelectedTags: (tagIds: string[]) => void;
   logout: () => void;
   fetchEvents: () => Promise<void>;
+  fetchTags: () => Promise<void>;
 }
 
 export const useStore = create<State>()(
@@ -35,26 +45,45 @@ export const useStore = create<State>()(
     (set, get) => ({
       user: null,
       events: [],
+      tags: [],
+      selectedTags: [],
       setUser: (user) => set({ user }),
       setEvents: (events) => set({ events }),
+      setSelectedTags: (tagIds) => {
+        set({ selectedTags: tagIds });
+        get().fetchEvents();
+      },
       logout: () => {
-        set({ user: null, events: [] });
+        set({ user: null, events: [], selectedTags: [] });
         localStorage.removeItem('token');
       },
       fetchEvents: async () => {
         const currentUser = get().user;
-        const url = currentUser?.id 
-          ? `/events?userId=${currentUser.id}` 
-          : '/events';
+        const selectedTags = get().selectedTags;
+
+        const params = new URLSearchParams();
+        if (currentUser?.id) params.set('userId', currentUser.id);
+        if (selectedTags.length > 0) params.set('tagIds', selectedTags.join(','));
 
         try {
-          const res = await api.get(url);
+          const res = await api.get(`/events?${params.toString()}`);
           set({ events: res.data });
         } catch (error) {
           console.error("Error fetching events:", error);
         }
       },
+      fetchTags: async () => {
+        try {
+          const res = await api.get('/events/tags');
+          set({ tags: res.data });
+        } catch (error) {
+          console.error("Error fetching tags:", error);
+        }
+      },
     }),
-    { name: 'user-storage' }
+    { 
+      name: 'user-storage',
+      partialize: (state) => ({ user: state.user })
+    }
   )
 );
