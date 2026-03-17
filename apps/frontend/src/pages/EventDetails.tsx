@@ -97,7 +97,7 @@ export function EventDetails() {
   const tags = event.tags || [];
 
   return (
-    <div className="bg-slate-50/30 p-6">
+    <div className="bg-slate-50/30 px-3 py-4 md:p-6">
       <div className="max-w-3xl mx-auto">
         {/* Back button */}
         <button
@@ -112,7 +112,7 @@ export function EventDetails() {
           isPrivate ? 'bg-gradient-to-br from-white to-purple-50/50 border-purple-100' : 'bg-white border-slate-100'
         }`}>
           {/* Header Section */}
-          <div className="p-8 md:p-12 border-b border-slate-50">
+          <div className="p-4 md:p-12 border-b border-slate-50">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex-1">
                 {isPrivate && (
@@ -121,7 +121,7 @@ export function EventDetails() {
                     <span className="text-[10px] uppercase tracking-widest font-black">Private Event</span>
                   </div>
                 )}
-                <h1 className={`text-4xl md:text-5xl font-black leading-tight mb-4 ${
+                <h1 className={`text-3xl md:text-5xl font-black leading-tight mb-3 ${
                   isPrivate ? 'text-purple-900' : 'text-slate-900'
                 }`}>
                   {event.title}
@@ -169,13 +169,13 @@ export function EventDetails() {
           </div>
 
           {/* Details Grid */}
-          <div className="p-8 md:p-12 grid md:grid-cols-2 gap-10">
-            <div className="space-y-6">
+          <div className="p-4 md:p-12 grid md:grid-cols-2 gap-4 md:gap-10">
+            <div className="space-y-3 md:space-y-6">
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Event Info</h3>
 
-              <div className="space-y-4">
-                <div className="flex items-center p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
-                  <div className={`p-3 rounded-xl mr-4 ${isPrivate ? 'bg-purple-100 text-purple-600' : 'bg-indigo-100 text-indigo-600'}`}>
+              <div className="space-y-2 md:space-y-4">
+                <div className="flex items-center p-3 md:p-4 bg-slate-50 rounded-2xl md:rounded-[1.5rem] border border-slate-100">
+                  <div className={`p-2 md:p-3 rounded-xl mr-3 ${isPrivate ? 'bg-purple-100 text-purple-600' : 'bg-indigo-100 text-indigo-600'}`}>
                     <CalendarDaysIcon className="w-6 h-6" />
                   </div>
                   <div>
@@ -186,8 +186,8 @@ export function EventDetails() {
                   </div>
                 </div>
 
-                <div className="flex items-center p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
-                  <div className="p-3 rounded-xl mr-4 bg-rose-100 text-rose-600">
+                <div className="flex items-center p-3 md:p-4 bg-slate-50 rounded-2xl md:rounded-[1.5rem] border border-slate-100">
+                  <div className="p-2 md:p-3 rounded-xl mr-3 bg-rose-100 text-rose-600">
                     <MapPinIcon className="w-6 h-6" />
                   </div>
                   <div>
@@ -196,8 +196,8 @@ export function EventDetails() {
                   </div>
                 </div>
 
-                <div className="flex items-center p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
-                  <div className="p-3 rounded-xl mr-4 bg-emerald-100 text-emerald-600">
+                <div className="flex items-center p-3 md:p-4 bg-slate-50 rounded-2xl md:rounded-[1.5rem] border border-slate-100">
+                  <div className="p-2 md:p-3 rounded-xl mr-3 bg-emerald-100 text-emerald-600">
                     <UsersIcon className="w-6 h-6" />
                   </div>
                   <div>
@@ -230,7 +230,7 @@ export function EventDetails() {
                 )}
               </div>
 
-              <div className="mt-8">
+              <div className="mt-4 md:mt-8">
                 <JoinButton
                   event={event}
                   onRefresh={fetch}

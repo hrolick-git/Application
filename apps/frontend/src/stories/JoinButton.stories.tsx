@@ -6,7 +6,7 @@ const meta: Meta<typeof JoinButton> = {
   title: 'Components/JoinButton',
   component: JoinButton,
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <div className="p-4 max-w-sm">
         <Toaster />
         <Story />

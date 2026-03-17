@@ -7,7 +7,7 @@ export const Logo = () => (
       <TicketIcon className="w-6 h-6 text-white" />
     </div>
     <span className="text-xl font-black tracking-tight text-slate-800">
-      Event<span className="text-indigo-600">Hub</span>
+      Vibe<span className="text-indigo-600">Check</span>
     </span>
   </Link>
 );

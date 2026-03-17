@@ -45,7 +45,7 @@ export function Settings() {
         <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-indigo-50/50">
           <SectionTitle icon={UserIcon} title="Public Profile" />
           
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-4">
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Display Name</label>
               <input 
@@ -72,7 +72,7 @@ export function Settings() {
         <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-indigo-50/50">
           <SectionTitle icon={BellIcon} title="Notifications" />
           
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-4">
             {[
               { label: 'Email Notifications', desc: 'Get updates about new events' },
               { label: 'Marketing Emails', desc: 'Special offers and platform news' }

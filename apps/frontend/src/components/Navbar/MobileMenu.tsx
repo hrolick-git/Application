@@ -24,7 +24,7 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
       className="fixed top-0 right-0 h-full w-[80%] max-w-[320px] z-[100] shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300 border-l border-slate-100"
     >
       <div className="flex justify-between items-center mb-8">
-        <span className="text-xl font-black text-slate-800">EventHub</span>
+        <span className="text-xl font-black text-slate-800">NodeEvents</span>
         <button 
           onClick={onClose} 
           className="p-2 bg-slate-100 rounded-xl hover:bg-red-50 text-slate-600 hover:text-red-500 transition-colors"
@@ -33,7 +33,7 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
         </button>
       </div>
 
-      <div className="flex flex-col space-y-4 overflow-y-auto">
+      <div className="flex flex-col space-y-2 md:space-y-4 overflow-y-auto">
         {/* Web Content will now be on 100% white background */}
         <Link to="/events" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl">
           <TicketIcon className="w-6 h-6 text-indigo-600" />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import api from '../api/api';
 import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
@@ -55,10 +55,15 @@ interface Event {
   tags?: Tag[];
 }
 
+const EVENTS_PER_PAGE = 6;
+
 export function EventsList() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(EVENTS_PER_PAGE);
+  const loaderRef = useRef<HTMLDivElement>(null);
+
   const tags = useStore((s) => s.tags);
   const selectedTags = useStore((s) => s.selectedTags);
   const setSelectedTags = useStore((s) => s.setSelectedTags);
@@ -78,6 +83,27 @@ export function EventsList() {
 
     return matchesSearch && matchesTags;
   });
+
+  const visibleEvents = filteredEvents.slice(0, visibleCount);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount(prev => prev + EVENTS_PER_PAGE);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [loading]);
+
+  // Reset visible count on filter change
+  useEffect(() => {
+    setVisibleCount(EVENTS_PER_PAGE);
+  }, [searchQuery, selectedTags]);
 
   const fetchEvents = async () => {
     try {
@@ -160,27 +186,36 @@ export function EventsList() {
           </motion.div>
         )}
 
-        {filteredEvents.length > 0 ? (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 items-start"
-          >
-            {filteredEvents.map(e => (
-              <motion.div key={e.id} variants={cardVariants}>
-                <EventCard
-                  event={e}
-                  isOrganizer={user?.id === e.organizerId}
-                  onRefresh={fetchEvents}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
+        {visibleEvents.length > 0 ? (
+          <>
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 items-start"
+            >
+              {visibleEvents.map(e => (
+                <motion.div key={e.id} variants={cardVariants}>
+                  <EventCard
+                    event={e}
+                    isOrganizer={user?.id === e.organizerId}
+                    onRefresh={fetchEvents}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Infinite scroll trigger */}
+            {visibleCount < filteredEvents.length && (
+              <div ref={loaderRef} className="flex justify-center py-8">
+                <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+              </div>
+            )}
+          </>
         ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <EmptyState
-              title="No events match the selected tags"
+              title="No events found"
               message={
                 selectedTags.length > 0
                   ? "No events match the selected tags."

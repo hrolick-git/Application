@@ -36,7 +36,7 @@ export function CreateEvent() {
   };
 
   return (
-    <div className="bg-slate-50/30 p-6">
+    <div className="bg-slate-50/30 px-3 py-4 md:p-6">
       <div className="max-w-xl mx-auto">
         {/* Back Button */}
         <button 
@@ -48,14 +48,14 @@ export function CreateEvent() {
         </button>
 
         <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-100/50 border border-slate-100 overflow-hidden">
-          <div className="p-8 md:p-12">
+          <div className="p-5 md:p-12">
             {/* Section Header */}
-            <div className="flex items-center space-x-5 mb-10">
-              <div className="bg-indigo-600 p-4 rounded-[1.25rem] shadow-lg shadow-indigo-200">
-                <PlusIcon className="w-8 h-8 text-white" />
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="bg-indigo-600 p-3 md:p-4 rounded-[1.25rem] shadow-lg shadow-indigo-200 shrink-0">
+                <PlusIcon className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Create Event</h2>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Create Event</h2>
                 <p className="text-slate-500 mt-1 flex items-center font-medium">
                   Fill in the details for your next big thing <SparklesIcon className="w-4 h-4 ml-1.5 text-amber-400" />
                 </p>

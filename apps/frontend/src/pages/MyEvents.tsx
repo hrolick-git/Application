@@ -82,12 +82,12 @@ export function MyEvents() {
     <motion.div 
       initial="hidden" 
       animate="visible" 
-      className="p-6 md:p-10 bg-slate-50/30 min-h-screen"
+      className="px-3 py-4 md:p-10 bg-slate-50/30"
     >
       <div className="max-w-7xl mx-auto">
         
         {/* Header Section */}
-        <motion.div variants={fadeInUp} className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <motion.div variants={fadeInUp} className="mb-4 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest rounded-full">
@@ -117,7 +117,7 @@ export function MyEvents() {
         {/* Calendar Container */}
         <motion.div 
           variants={fadeInUp}
-          className="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden"
+          className="bg-white p-3 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden"
         >
           <CalendarView
             events={events}
@@ -129,7 +129,7 @@ export function MyEvents() {
         {/* Footer info */}
         <motion.p 
           variants={fadeInUp}
-          className="mt-8 text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] opacity-50"
+          className="mt-4 md:mt-8 text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] opacity-50"
         >
           Click on any event to see full details
         </motion.p>
