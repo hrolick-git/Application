@@ -1,4 +1,4 @@
-# 📅 EventHub
+# 📅 VibeCheck
 
 > A full-stack web application for event management with registration, calendar view, and JWT authentication.
 
@@ -38,7 +38,7 @@
 ## 🗂 Project Structure (Monorepo)
 
 ```
-eventhub/
+application/
 ├── apps/
 │   ├── backend/          # NestJS REST API
 │   │   ├── src/
@@ -66,7 +66,7 @@ eventhub/
 ```bash
 # 1. Clone the repository
 git clone <repo-url>
-cd eventhub
+cd application
 
 # 2. Copy environment variables
 cp .env.example .env

@@ -69,7 +69,7 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-3 md:space-y-6">
       {/* Title */}
       <div>
         <label className={labelClasses}>Event Title</label>

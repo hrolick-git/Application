@@ -6,7 +6,7 @@ const meta: Meta<typeof EventCard> = {
   title: 'Components/EventCard',
   component: EventCard,
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <MemoryRouter>
         <div className="max-w-sm p-4">
           <Story />

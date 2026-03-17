@@ -43,7 +43,7 @@ export class AiService {
 
     const today = new Date().toISOString();
 
-    const prompt = `You are an AI assistant for an event management app called EventHub.
+    const prompt = `You are an AI assistant for an event management app called VibeCheck.
 Today's date is ${today}.
 The user is asking: "${question}"
 

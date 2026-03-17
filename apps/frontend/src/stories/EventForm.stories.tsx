@@ -5,7 +5,7 @@ const meta: Meta<typeof EventForm> = {
   title: 'Components/EventForm',
   component: EventForm,
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <div className="p-6 max-w-2xl bg-white rounded-2xl shadow">
         <Story />
       </div>
@@ -19,7 +19,7 @@ type Story = StoryObj<typeof EventForm>;
 export const Create: Story = {
   args: {
     buttonText: 'Create Event',
-    onSubmit: (data) => console.log('submitted', data),
+    onSubmit: (data: any) => console.log('submitted', data),
     availableTags: [
       { id: '1', name: 'Tech' },
       { id: '2', name: 'Art' },
@@ -42,6 +42,6 @@ export const Edit: Story = {
       visibility: 'PUBLIC',
       tags: [{ id: 'tag-1', name: 'Tech' }],
     },
-    onSubmit: (data) => console.log('submitted', data),
+    onSubmit: (data: any) => console.log('submitted', data),
   },
 };
