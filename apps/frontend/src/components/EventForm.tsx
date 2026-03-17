@@ -10,9 +10,10 @@ interface EventFormProps {
   initialData?: any;
   onSubmit: (data: any) => void;
   buttonText: string;
+  availableTags?: Tag[];
 }
 
-export function EventForm({ initialData, onSubmit, buttonText }: EventFormProps) {
+export function EventForm({ initialData, onSubmit, buttonText, availableTags: propTags }: EventFormProps) {
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
     initialData?.tags?.map((t: Tag) => t.id) || []
@@ -29,6 +30,10 @@ export function EventForm({ initialData, onSubmit, buttonText }: EventFormProps)
   });
 
   useEffect(() => {
+    if (propTags) {
+      setAvailableTags(propTags);
+      return;
+    }
     api.get('/events/tags').then(res => setAvailableTags(res.data)).catch(() => {});
   }, []);
 
