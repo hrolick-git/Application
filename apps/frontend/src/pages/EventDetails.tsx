@@ -13,6 +13,7 @@ import {
   PencilSquareIcon,
   LockClosedIcon
 } from '@heroicons/react/24/outline';
+import { toast } from 'react-hot-toast';
 
 interface Tag {
   id: string;
@@ -82,7 +83,7 @@ export function EventDetails() {
         await api.delete(`/events/${id}`);
         navigate('/events');
       } catch (err: any) {
-        alert(err.response?.data?.message || 'Error deleting event');
+        toast.error(err.response?.data?.message || 'Error deleting event');
       }
     }
   };

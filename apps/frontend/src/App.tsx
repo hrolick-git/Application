@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import { Navbar } from "./components/Navbar";
 import { AIAssistant } from './components/AIAssistant';
 import { Login } from "./pages/Login";
@@ -43,7 +44,8 @@ export function App() {
     <AppInit>
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Navbar />
-        <div className="mx-auto max-w-7xl">
+        <Toaster position="top-right" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

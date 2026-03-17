@@ -6,6 +6,7 @@ import {
   ExclamationTriangleIcon, 
   TrashIcon 
 } from '@heroicons/react/24/outline';
+import { toast } from 'react-hot-toast';
 
 export function Settings() {
   const { user, setUser } = useStore();
@@ -15,7 +16,7 @@ export function Settings() {
   const handleSave = () => {
     if (user) {
       setUser({ ...user, name });
-      alert('Settings saved successfully! 🚀');
+      toast.success('Settings saved successfully! 🚀');
     }
   };
 
@@ -106,7 +107,7 @@ export function Settings() {
             <button 
             onClick={() => {
                 if(confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
-                alert('Account scheduled for deletion (simulation)');
+                  toast.error('Account scheduled for deletion (simulation)');
                 }
             }}
             className="flex items-center justify-center space-x-2 px-6 py-3 bg-white text-red-600 font-bold rounded-2xl border-2 border-red-100 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all active:scale-95"

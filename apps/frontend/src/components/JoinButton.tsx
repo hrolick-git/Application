@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import api from '../api/api';
 import { useStore } from '../store/useStore';
 
@@ -24,7 +25,7 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
     e.preventDefault(); // if this button is inside a Link, prevent navigation
     
     const token = localStorage.getItem('token');
-    if (!token) return alert('You must be logged in to join an event');
+    if (!token) return toast.error('You must be logged in to join an event');;
 
     try {
       if (isJoined) {
@@ -35,7 +36,7 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
       onRefresh(); // call to refresh data in the parent component
     } catch (err: any) {
       console.error(err);
-      alert(err.response?.data?.message || 'Action failed');
+      toast.error(err.response?.data?.message || 'Action failed');
     }
   };
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import api from '../api/api';
 import { AuthForm } from '../components/AuthForm';
+import { toast } from 'react-hot-toast';
 
 export function Register() {
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,7 @@ const handleRegister = async (data: any) => {
     // 3. Redirect to the events page
     navigate('/events');
   } catch (err: any) {
-    alert(err.response?.data?.message || 'Registration failed');
+    toast.error(err.response?.data?.message || 'Registration failed');
   } finally {
     setLoading(false);
   }
