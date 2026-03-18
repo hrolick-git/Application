@@ -8,7 +8,7 @@ interface Tag {
 
 interface EventFormProps {
   initialData?: any;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: any) => Promise<void> | void;
   buttonText: string;
   availableTags?: Tag[];
 }
@@ -50,9 +50,16 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ ...formData, tagIds: selectedTagIds });
+    try {
+      setIsLoading(true);
+      await onSubmit({ ...formData, tagIds: selectedTagIds });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const inputClasses = "w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none text-slate-700 placeholder:text-slate-400 font-medium";
@@ -200,9 +207,10 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
 
       <button
         type="submit"
-        className="w-full mt-4 py-5 bg-indigo-600 text-white rounded-[1.5rem] font-black text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95"
+        disabled={isLoading}
+        className="w-full mt-4 py-5 bg-indigo-600 text-white rounded-[1.5rem] font-black text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        {buttonText}
+        {isLoading ? 'Processing...' : buttonText}
       </button>
     </form>
   );

@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import api from '../api/api';
 import { useStore } from '../store/useStore';
@@ -10,6 +11,7 @@ interface JoinButtonProps {
 
 export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps) {
   const user = useStore((s) => s.user);
+  const [isLoading, setIsLoading] = useState(false);
 
   // State checks
   const isPrivate = event.visibility === 'PRIVATE';
@@ -23,11 +25,12 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault(); // if this button is inside a Link, prevent navigation
-    
+
     const token = localStorage.getItem('token');
     if (!token) return toast.error('You must be logged in to join an event');;
 
     try {
+      setIsLoading(true);
       if (isJoined) {
         await api.post(`/events/${event.id}/leave`);
       } else {
@@ -37,12 +40,14 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Action failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <button
-      disabled={isFull && !isJoined}
+      disabled={(isFull && !isJoined) || isLoading}
       onClick={handleToggle}
       className={`w-full py-4 rounded-[1.25rem] font-black text-sm transition-all duration-300 transform active:scale-95 shadow-xl ${
         isJoined 
@@ -54,7 +59,15 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
               : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200 hover:-translate-y-1'
       } ${className}`}
     >
-      {isJoined ? 'Leave Event' : isFull ? 'Event Full' : isPrivate ? 'Private Join' : 'Join Event'}
+      {isLoading
+        ? 'Processing...'
+        : isJoined
+          ? 'Leave Event'
+          : isFull
+            ? 'Event Full'
+            : isPrivate
+              ? 'Private Join'
+              : 'Join Event'}
     </button>
   );
 }
