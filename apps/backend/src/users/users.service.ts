@@ -10,30 +10,34 @@ export class UsersService {
   }
 
   private buildArchiveWhere(archived: boolean, now = new Date()) {
-    return archived
-      ? {
-          OR: [
-            { endsAt: { lt: now } },
-            { endsAt: null, startsAt: { lt: now } },
-          ],
-        }
-      : {
-          OR: [
-            { endsAt: { gte: now } },
-            { endsAt: null, startsAt: { gte: now } },
-          ],
-        };
+    const archivedOrActive = archived
+      ? [
+          { endsAt: { lt: now } },
+          { endsAt: null, startsAt: { lt: now } },
+        ]
+      : [
+          { endsAt: { gte: now } },
+          { endsAt: null, startsAt: { gte: now } },
+        ];
+
+    return { OR: archivedOrActive };
   }
 
   async eventsForUser(userId: string, archived = false) {
     const now = new Date();
+    const accessWhere = {
+      OR: [
+        { organizerId: userId },
+        { participants: { some: { userId } } },
+      ],
+    };
+
     return this.prisma.event.findMany({
       where: {
-        OR: [
-          { organizerId: userId },
-          { participants: { some: { userId } } }
+        AND: [
+          accessWhere,
+          this.buildArchiveWhere(archived, now),
         ],
-        ...this.buildArchiveWhere(archived, now),
       },
       include: {
         participants: true,
