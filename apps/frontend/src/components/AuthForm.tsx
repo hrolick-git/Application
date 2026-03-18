@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EnvelopeIcon, LockClosedIcon, UserIcon } from '@heroicons/react/24/outline';
+import { PrimaryButton } from './PrimaryButton';
 
 interface AuthFormProps {
   type: 'login' | 'register';
@@ -64,13 +65,9 @@ export function AuthForm({ type, onSubmit, isLoading }: AuthFormProps) {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95 disabled:opacity-50"
-      >
-        {isLoading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
-      </button>
+      <PrimaryButton type="submit" isLoading={isLoading}>
+        {isLogin ? 'Sign In' : 'Create Account'}
+      </PrimaryButton>
 
       <p className="text-center text-slate-500 font-medium mt-6">
         {isLogin ? "Don't have an account?" : "Already have an account?"}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api/api';
+import { PrimaryButton } from './PrimaryButton';
 
 interface Tag {
   id: string;
@@ -205,13 +206,9 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full mt-4 py-5 bg-indigo-600 text-white rounded-[1.5rem] font-black text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
-      >
-        {isLoading ? 'Processing...' : buttonText}
-      </button>
+      <PrimaryButton type="submit" isLoading={isLoading} className="mt-4 rounded-[1.5rem]">
+        {buttonText}
+      </PrimaryButton>
     </form>
   );
 }
