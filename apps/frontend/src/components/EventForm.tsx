@@ -61,6 +61,7 @@ export function EventForm({
   };
 
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = window.innerWidth < 768;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,36 +100,30 @@ export function EventForm({
         />
       </div>
 
-      {/* Time Range Section */}
-      <div>
-        <FieldLabel>Event Duration</FieldLabel>
-        <div className="flex flex-col md:flex-row items-center overflow-hidden border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-          <div className="w-full">
-            <TextField
-              required
-              type="datetime-local"
-              name="startsAt"
-              value={formData.startsAt}
-              onChange={handleChange}
-              // Remove standard borders/rounding where they meet
-              className="border-none focus:ring-0 rounded-none w-full"
-              placeholder="Starts At"
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        {/* Starts At */}
+        <div className="w-full min-w-0">
+          <FieldLabel>Starts At</FieldLabel>
+          <TextField
+            required
+            type={isMobile ? "date" : "datetime-local"}
+            name="startsAt"
+            value={formData.startsAt}
+            onChange={handleChange}
+            className="w-full"
+          />
+        </div>
 
-          {/* Visual Divider for Desktop */}
-          <div className="hidden md:block text-slate-300 px-1">—</div>
-
-          <div className="w-full border-t md:border-t-0 md:border-l border-slate-100">
-            <TextField
-              type="datetime-local"
-              name="endsAt"
-              value={formData.endsAt}
-              onChange={handleChange}
-              className="border-none focus:ring-0 rounded-none w-full"
-              placeholder="Ends At (Optional)"
-            />
-          </div>
+        {/* Ends At */}
+        <div className="w-full min-w-0">
+          <FieldLabel>Ends At (Optional)</FieldLabel>
+          <TextField
+            type={isMobile ? "date" : "datetime-local"}
+            name="endsAt"
+            value={formData.endsAt}
+            onChange={handleChange}
+            className="w-full"
+          />
         </div>
       </div>
 
