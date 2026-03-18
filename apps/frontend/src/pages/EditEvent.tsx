@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import api from '../api/api';
-import { EventForm } from '../components/EventForm';
-import { PencilSquareIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
-import { toast } from 'react-hot-toast';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../api/api";
+import { EventForm } from "../components/EventForm";
+import { PencilSquareIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-hot-toast";
 
 export function EditEvent() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialData, setInitialData] = useState<any>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -19,12 +19,12 @@ export function EditEvent() {
 
         setInitialData({
           ...event,
-          startsAt: event.startsAt ? event.startsAt.substring(0, 16) : '',
-          endsAt: event.endsAt ? event.endsAt.substring(0, 16) : '',
-          capacity: event.capacity ?? '',
+          startsAt: event.startsAt ? event.startsAt.substring(0, 16) : "",
+          endsAt: event.endsAt ? event.endsAt.substring(0, 16) : "",
+          capacity: event.capacity ?? "",
         });
       } catch (err) {
-        setError('Failed to load event data');
+        setError("Failed to load event data");
       }
     };
     fetchEvent();
@@ -38,18 +38,19 @@ export function EditEvent() {
         location: formData.location,
         visibility: formData.visibility,
         startsAt: new Date(formData.startsAt).toISOString(),
-        tagIds: formData.tagIds || [],  // ← додай це
+        tagIds: formData.tagIds || [], // ← додай це
       };
 
       if (formData.endsAt) {
         payload.endsAt = new Date(formData.endsAt).toISOString();
       } else {
-        payload.endsAt = null; 
+        payload.endsAt = null;
       }
 
-      payload.capacity = (formData.capacity === "" || formData.capacity === null) 
-        ? null 
-        : Number(formData.capacity);
+      payload.capacity =
+        formData.capacity === "" || formData.capacity === null
+          ? null
+          : Number(formData.capacity);
 
       await api.patch(`/events/${id}`, payload);
       navigate(`/events/${id}`);
@@ -59,24 +60,31 @@ export function EditEvent() {
     }
   };
 
-  if (error) return (
-    <div className="text-center mt-20">
-      <p className="text-red-500 font-medium">{error}</p>
-      <button onClick={() => navigate(-1)} className="mt-4 text-indigo-600 hover:underline">Back to Event Details</button>
-    </div>
-  );
+  if (error)
+    return (
+      <div className="text-center mt-20">
+        <p className="text-red-500 font-medium">{error}</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="mt-4 text-indigo-600 hover:underline"
+        >
+          Back to Event Details
+        </button>
+      </div>
+    );
 
-  if (!initialData) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-    </div>
-  );
+  if (!initialData)
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
 
   return (
     <div className="bg-slate-50/30 py-12 px-4">
       <div className="max-w-xl mx-auto">
         {/* Back button */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center text-slate-500 hover:text-slate-800 mb-6 transition-colors font-medium"
         >
@@ -85,22 +93,26 @@ export function EditEvent() {
         </button>
 
         <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-          <div className="p-8 md:p-10">
+          <div className="p-0 md:p-10">
             <div className="flex items-center space-x-4 mb-8">
               <div className="bg-amber-50 p-3 rounded-2xl">
                 <PencilSquareIcon className="w-8 h-8 text-amber-500" />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-800">Edit Event</h2>
-                <p className="text-slate-500 text-sm">Make changes to your event</p>
+                <h2 className="text-2xl font-black text-slate-800">
+                  Edit Event
+                </h2>
+                <p className="text-slate-500 text-sm">
+                  Make changes to your event
+                </p>
               </div>
             </div>
 
             {/* Event Form */}
-            <EventForm 
-              initialData={initialData} 
-              onSubmit={handleUpdate} 
-              buttonText="Save Changes" 
+            <EventForm
+              initialData={initialData}
+              onSubmit={handleUpdate}
+              buttonText="Save Changes"
             />
           </div>
         </div>

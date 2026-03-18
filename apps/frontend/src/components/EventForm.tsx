@@ -99,29 +99,27 @@ export function EventForm({
         />
       </div>
 
+      {/* Starts At */}
       <div>
-        {/* Starts At */}
-        <div>
-          <FieldLabel>Starts At</FieldLabel>
-          <TextField
-            required
-            type="datetime-local"
-            name="startsAt"
-            value={formData.startsAt}
-            onChange={handleChange}
-          />
-        </div>
+        <FieldLabel>Starts At</FieldLabel>
+        <TextField
+          required
+          type="datetime-local"
+          name="startsAt"
+          value={formData.startsAt}
+          onChange={handleChange}
+        />
+      </div>
 
-        {/* Ends At */}
-        <div>
-          <FieldLabel>Ends At (Optional)</FieldLabel>
-          <TextField
-            type="datetime-local"
-            name="endsAt"
-            value={formData.endsAt}
-            onChange={handleChange}
-          />
-        </div>
+      {/* Ends At */}
+      <div>
+        <FieldLabel>Ends At (Optional)</FieldLabel>
+        <TextField
+          type="datetime-local"
+          name="endsAt"
+          value={formData.endsAt}
+          onChange={handleChange}
+        />
       </div>
 
       {/* Location */}
