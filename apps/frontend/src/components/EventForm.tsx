@@ -100,13 +100,13 @@ export function EventForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      <div className="w-full max-w-sm">
         {/* Starts At */}
         <div className="w-full min-w-0">
           <FieldLabel>Starts At</FieldLabel>
           <TextField
             required
-            type={isMobile ? "date" : "datetime-local"}
+            type="datetime-local"
             name="startsAt"
             value={formData.startsAt}
             onChange={handleChange}
@@ -118,7 +118,7 @@ export function EventForm({
         <div className="w-full min-w-0">
           <FieldLabel>Ends At (Optional)</FieldLabel>
           <TextField
-            type={isMobile ? "date" : "datetime-local"}
+            type="datetime-local"
             name="endsAt"
             value={formData.endsAt}
             onChange={handleChange}

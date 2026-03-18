@@ -99,7 +99,7 @@ export function EventDetails() {
   const tags = event.tags || [];
 
   return (
-    <div className="bg-slate-50/30 px-3 py-4 md:p-6">
+    <div className="bg-slate-50/30 py-4 md:p-6">
       <div className="max-w-3xl mx-auto">
         {/* Back button */}
         <button
