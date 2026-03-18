@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Req,
+  Query,
   UseGuards,
   UsePipes,
   NotFoundException,
@@ -27,8 +28,8 @@ export class EventsController {
 
   /** List public events */
   @Get('public')
-  async publicList() {
-    return this.events.findPublicEvents();
+  async publicList(@Query('archived') archived?: string) {
+    return this.events.findPublicEvents(undefined, archived === 'true');
   }
 
   /** Public specific event */
@@ -56,8 +57,8 @@ export class EventsController {
   /** List events (PUBLIC + your PRIVATE) */
   @UseGuards(JwtAuthGuard)
   @Get()
-  async list(@Req() req: any) {
-    return this.events.list(req.user.id);
+  async list(@Req() req: any, @Query('archived') archived?: string) {
+    return this.events.list(req.user.id, undefined, archived === 'true');
   }
 
   /** Specific event (PUBLIC or your PRIVATE) */

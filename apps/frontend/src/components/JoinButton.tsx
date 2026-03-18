@@ -21,8 +21,9 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
     )
   );
   const isFull = event.capacity ? event.participants?.length >= event.capacity : false;
+  const isArchived = !!event.isArchived;
 
-  const isDisabled = (isFull && !isJoined) || isLoading;
+  const isDisabled = isArchived || (isFull && !isJoined) || isLoading;
 
   const baseClasses =
     'w-full py-4 rounded-[1.25rem] font-black text-sm transition-all duration-300 transform active:scale-95';
@@ -31,6 +32,8 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
     ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 shadow-none'
     : isFull
       ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
+      : isArchived
+        ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
       : isPrivate
         ? 'bg-purple-700 text-white hover:bg-purple-800 shadow-purple-200 hover:-translate-y-1 shadow-xl'
         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200 hover:-translate-y-1 shadow-xl';
@@ -41,6 +44,8 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
       ? 'Leave Event'
       : isFull
         ? 'Event Full'
+        : isArchived
+          ? 'Archived'
         : isPrivate
           ? 'Private Join'
           : 'Join Event';

@@ -61,6 +61,7 @@ export function EventsList() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [archivedView, setArchivedView] = useState(false);
   const [visibleCount, setVisibleCount] = useState(EVENTS_PER_PAGE);
   const loaderRef = useRef<HTMLDivElement>(null);
 
@@ -109,8 +110,8 @@ export function EventsList() {
     try {
       const token = localStorage.getItem('token');
       const res = token
-        ? await api.get<Event[]>('/events')
-        : await api.get<Event[]>('/events/public');
+        ? await api.get<Event[]>('/events', { params: { archived: archivedView } })
+        : await api.get<Event[]>('/events/public', { params: { archived: archivedView } });
       setEvents(res.data);
     } catch (err) {
       console.error(err);
@@ -120,9 +121,12 @@ export function EventsList() {
   };
 
   useEffect(() => {
-    fetchEvents();
     fetchTags();
   }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [archivedView]);
 
   const toggleTag = (tagId: string) => {
     const next = selectedTags.includes(tagId)
@@ -149,6 +153,30 @@ export function EventsList() {
           </div>
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
         </motion.header>
+
+        {/* Active / Archive toggle */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setArchivedView(false)}
+            className={`px-4 py-2 rounded-2xl text-sm font-black border transition-all ${
+              !archivedView
+                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setArchivedView(true)}
+            className={`px-4 py-2 rounded-2xl text-sm font-black border transition-all ${
+              archivedView
+                ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            Archive
+          </button>
+        </div>
 
         {/* Tag Filter */}
         {tags.length > 0 && (

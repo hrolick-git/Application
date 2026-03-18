@@ -19,6 +19,7 @@ export function MyEvents() {
   const user = useStore((s) => s.user);
   
   const [events, setEvents] = useState<any[]>([]);
+  const [archivedView, setArchivedView] = useState(false);
   const [initialDate, setInitialDate] = useState<Date>(new Date());
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export function MyEvents() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get("/users/me/events", { withCredentials: true });
+        const res = await api.get("/users/me/events", { params: { archived: archivedView }, withCredentials: true });
         
         // Save the original data for the store (statistics in Profile)
         setGlobalEvents(res.data);
@@ -55,7 +56,7 @@ export function MyEvents() {
         setLoaded(true);
       }
     })();
-  }, [user?.id, setGlobalEvents]);
+  }, [user?.id, setGlobalEvents, archivedView]);
 
   const handleEventClick = (eventInfo: any) => {
     navigate(`/events/${eventInfo.event.id}`);
@@ -113,6 +114,30 @@ export function MyEvents() {
             </div>
           </Link>
         </motion.div>
+
+        {/* Active / Archive toggle */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setArchivedView(false)}
+            className={`px-4 py-2 rounded-2xl text-sm font-black border transition-all ${
+              !archivedView
+                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            Upcoming
+          </button>
+          <button
+            onClick={() => setArchivedView(true)}
+            className={`px-4 py-2 rounded-2xl text-sm font-black border transition-all ${
+              archivedView
+                ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            Archived
+          </button>
+        </div>
         
         {/* Calendar Container */}
         <motion.div 

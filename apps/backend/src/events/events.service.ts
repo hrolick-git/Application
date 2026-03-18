@@ -5,13 +5,44 @@ import { PrismaService } from '../prisma.service';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async list(userId?: string, tagIds?: string[]) {
+  private buildArchiveWhere(archived: boolean, now = new Date()) {
+    return archived
+      ? {
+          OR: [
+            { endsAt: { lt: now } },
+            { endsAt: null, startsAt: { lt: now } },
+          ],
+        }
+      : {
+          OR: [
+            { endsAt: { gte: now } },
+            { endsAt: null, startsAt: { gte: now } },
+          ],
+        };
+  }
+
+  private withComputedFlags(events: any[], userId?: string, now = new Date()) {
+    return JSON.parse(JSON.stringify(events)).map((e: any) => {
+      const endOrStart = e.endsAt ? new Date(e.endsAt) : new Date(e.startsAt);
+      const isArchived = endOrStart.getTime() < now.getTime();
+      return {
+        ...e,
+        joined: userId ? e.participants.some((p: any) => p.userId === userId) : false,
+        isArchived,
+        tags: e.tags.map((et: any) => et.tag),
+      };
+    });
+  }
+
+  async list(userId?: string, tagIds?: string[], archived = false) {
+    const now = new Date();
     const events = await this.prisma.event.findMany({
       where: {
         OR: [
           { visibility: 'PUBLIC' },
           ...(userId ? [{ organizerId: userId }] : []),
         ],
+        ...this.buildArchiveWhere(archived, now),
         ...(tagIds?.length ? {
           tags: { some: { tagId: { in: tagIds } } }
         } : {})
@@ -23,11 +54,7 @@ export class EventsService {
       },
     });
 
-    return JSON.parse(JSON.stringify(events)).map((e: any) => ({
-      ...e,
-      joined: userId ? e.participants.some((p: any) => p.userId === userId) : false,
-      tags: e.tags.map((et: any) => et.tag)
-    }));
+    return this.withComputedFlags(events, userId, now);
   }
 
   async get(id: string, userId?: string) {
@@ -130,10 +157,12 @@ export class EventsService {
     });
   }
 
-  async findPublicEvents(tagIds?: string[]) {
+  async findPublicEvents(tagIds?: string[], archived = false) {
+    const now = new Date();
     const events = await this.prisma.event.findMany({
       where: {
         visibility: 'PUBLIC',
+        ...this.buildArchiveWhere(archived, now),
         ...(tagIds?.length ? {
           tags: { some: { tagId: { in: tagIds } } }
         } : {})
@@ -145,10 +174,7 @@ export class EventsService {
       },
     });
 
-    return JSON.parse(JSON.stringify(events)).map((e: any) => ({
-      ...e,
-      tags: e.tags.map((et: any) => et.tag)
-    }));
+    return this.withComputedFlags(events, undefined, now);
   }
 
   async findById(id: string) {
