@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import api from '../api/api';
-import { PrimaryButton } from './PrimaryButton';
-import type { Tag } from '../types/tag';
-import { TagSelector } from './tags/TagSelector';
-import { FieldLabel } from './form/FieldLabel';
-import { TextField } from './form/TextField';
-import { TextAreaField } from './form/TextAreaField';
-import { SelectField } from './form/SelectField';
+import { useState, useEffect } from "react";
+import api from "../api/api";
+import { PrimaryButton } from "./PrimaryButton";
+import type { Tag } from "../types/tag";
+import { TagSelector } from "./tags/TagSelector";
+import { FieldLabel } from "./form/FieldLabel";
+import { TextField } from "./form/TextField";
+import { TextAreaField } from "./form/TextAreaField";
+import { SelectField } from "./form/SelectField";
 
 interface EventFormProps {
   initialData?: any;
@@ -15,20 +15,29 @@ interface EventFormProps {
   availableTags?: Tag[];
 }
 
-export function EventForm({ initialData, onSubmit, buttonText, availableTags: propTags }: EventFormProps) {
+export function EventForm({
+  initialData,
+  onSubmit,
+  buttonText,
+  availableTags: propTags,
+}: EventFormProps) {
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    initialData?.tags?.map((t: Tag) => t.id) || []
+    initialData?.tags?.map((t: Tag) => t.id) || [],
   );
 
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    location: initialData?.location || '',
-    startsAt: initialData?.startsAt ? new Date(initialData.startsAt).toISOString().slice(0, 16) : '',
-    endsAt: initialData?.endsAt ? new Date(initialData.endsAt).toISOString().slice(0, 16) : '',
-    capacity: initialData?.capacity || '',
-    visibility: initialData?.visibility || 'PUBLIC',
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    location: initialData?.location || "",
+    startsAt: initialData?.startsAt
+      ? new Date(initialData.startsAt).toISOString().slice(0, 16)
+      : "",
+    endsAt: initialData?.endsAt
+      ? new Date(initialData.endsAt).toISOString().slice(0, 16)
+      : "",
+    capacity: initialData?.capacity || "",
+    visibility: initialData?.visibility || "PUBLIC",
   });
 
   useEffect(() => {
@@ -36,10 +45,17 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
       setAvailableTags(propTags);
       return;
     }
-    api.get('/events/tags').then(res => setAvailableTags(res.data)).catch(() => {});
+    api
+      .get("/events/tags")
+      .then((res) => setAvailableTags(res.data))
+      .catch(() => {});
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -83,7 +99,7 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
         {/* Starts At */}
         <div>
           <FieldLabel>Starts At</FieldLabel>
@@ -166,7 +182,11 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
         </div>
       )}
 
-      <PrimaryButton type="submit" isLoading={isLoading} className="mt-4 rounded-[1.5rem]">
+      <PrimaryButton
+        type="submit"
+        isLoading={isLoading}
+        className="mt-4 rounded-[1.5rem]"
+      >
         {buttonText}
       </PrimaryButton>
     </form>
