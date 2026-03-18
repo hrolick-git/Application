@@ -99,30 +99,36 @@ export function EventForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        {/* Starts At */}
-        <div className="w-full">
-          <FieldLabel>Starts At</FieldLabel>
-          <TextField
-            required
-            type="datetime-local"
-            name="startsAt"
-            value={formData.startsAt}
-            onChange={handleChange}
-            className="w-full" // Переконайся, що інпут займає 100%
-          />
-        </div>
+      {/* Time Range Section */}
+      <div>
+        <FieldLabel>Event Duration</FieldLabel>
+        <div className="flex flex-col md:flex-row items-center overflow-hidden border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+          <div className="w-full">
+            <TextField
+              required
+              type="datetime-local"
+              name="startsAt"
+              value={formData.startsAt}
+              onChange={handleChange}
+              // Remove standard borders/rounding where they meet
+              className="border-none focus:ring-0 rounded-none w-full"
+              placeholder="Starts At"
+            />
+          </div>
 
-        {/* Ends At */}
-        <div className="w-full">
-          <FieldLabel>Ends At (Optional)</FieldLabel>
-          <TextField
-            type="datetime-local"
-            name="endsAt"
-            value={formData.endsAt}
-            onChange={handleChange}
-            className="w-full"
-          />
+          {/* Visual Divider for Desktop */}
+          <div className="hidden md:block text-slate-300 px-1">—</div>
+
+          <div className="w-full border-t md:border-t-0 md:border-l border-slate-100">
+            <TextField
+              type="datetime-local"
+              name="endsAt"
+              value={formData.endsAt}
+              onChange={handleChange}
+              className="border-none focus:ring-0 rounded-none w-full"
+              placeholder="Ends At (Optional)"
+            />
+          </div>
         </div>
       </div>
 
