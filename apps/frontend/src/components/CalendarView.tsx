@@ -66,7 +66,6 @@ export function CalendarView({ events, initialDate, eventClick }: Props) {
       height="auto"
       locale="en"
       eventClick={eventClick}
-      contentHeight="auto"
       // Show tooltip on event hover using tippy.js
       eventDidMount={(info) => {
         const tags = info.event.extendedProps.tags as

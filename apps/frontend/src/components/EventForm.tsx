@@ -100,7 +100,7 @@ export function EventForm({
         />
       </div>
 
-      <div className="w-full md:w-72 space-y-4">
+      <div className="w-64 md:w-72 space-y-4">
         {/* Starts At */}
         <div className="relative w-full">
           <FieldLabel>Starts At</FieldLabel>
