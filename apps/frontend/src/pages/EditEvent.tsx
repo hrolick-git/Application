@@ -93,7 +93,7 @@ export function EditEvent() {
         </button>
 
         <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-          <div className="p-0 md:p-10">
+          <div className="p-6 md:p-10">
             <div className="flex items-center space-x-4 mb-8">
               <div className="bg-amber-50 p-3 rounded-2xl">
                 <PencilSquareIcon className="w-8 h-8 text-amber-500" />

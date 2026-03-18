@@ -99,27 +99,31 @@ export function EventForm({
         />
       </div>
 
-      {/* Starts At */}
-      <div>
-        <FieldLabel>Starts At</FieldLabel>
-        <TextField
-          required
-          type="datetime-local"
-          name="startsAt"
-          value={formData.startsAt}
-          onChange={handleChange}
-        />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        {/* Starts At */}
+        <div className="w-full">
+          <FieldLabel>Starts At</FieldLabel>
+          <TextField
+            required
+            type="datetime-local"
+            name="startsAt"
+            value={formData.startsAt}
+            onChange={handleChange}
+            className="w-full" // Переконайся, що інпут займає 100%
+          />
+        </div>
 
-      {/* Ends At */}
-      <div>
-        <FieldLabel>Ends At (Optional)</FieldLabel>
-        <TextField
-          type="datetime-local"
-          name="endsAt"
-          value={formData.endsAt}
-          onChange={handleChange}
-        />
+        {/* Ends At */}
+        <div className="w-full">
+          <FieldLabel>Ends At (Optional)</FieldLabel>
+          <TextField
+            type="datetime-local"
+            name="endsAt"
+            value={formData.endsAt}
+            onChange={handleChange}
+            className="w-full"
+          />
+        </div>
       </div>
 
       {/* Location */}

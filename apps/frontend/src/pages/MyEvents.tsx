@@ -4,32 +4,40 @@ import api from "../api/api";
 import { CalendarView } from "../components/CalendarView";
 import { Loader } from "../components/Loader";
 import { EmptyState } from "../components/EmptyState";
-import { CalendarIcon, MagnifyingGlassIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarIcon,
+  MagnifyingGlassIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline";
 import { useStore } from "../store/useStore";
 import { motion } from "framer-motion";
 
 // Settings for animations (similar to Profile)
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" as const },
+  },
 };
 
 export function MyEvents() {
   const setGlobalEvents = useStore((s) => s.setEvents);
   const user = useStore((s) => s.user);
-  
+
   const [events, setEvents] = useState<any[]>([]);
-  const [archivedView, setArchivedView] = useState(false);
   const [initialDate, setInitialDate] = useState<Date>(new Date());
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
-      setLoaded(false);
       try {
-        const res = await api.get("/users/me/events", { params: { archived: archivedView }, withCredentials: true });
-        
+        const res = await api.get("/users/me/events", {
+          withCredentials: true,
+        });
+
         // Save the original data for the store (statistics in Profile)
         setGlobalEvents(res.data);
 
@@ -57,7 +65,7 @@ export function MyEvents() {
         setLoaded(true);
       }
     })();
-  }, [user?.id, setGlobalEvents, archivedView]);
+  }, [user?.id, setGlobalEvents]);
 
   const handleEventClick = (eventInfo: any) => {
     navigate(`/events/${eventInfo.event.id}`);
@@ -68,16 +76,14 @@ export function MyEvents() {
   if (events.length === 0) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
-        <EmptyState 
-          title={archivedView ? "No archived events" : "Your calendar is empty"}
-          message={
-            archivedView
-              ? "You don't have any past events yet."
-              : "You haven't joined any events yet. Explore our community and find something exciting!"
-          }
+        <EmptyState
+          title="Your calendar is empty"
+          message="You haven't joined any events yet. Explore our community and find something exciting!"
           icon={<CalendarIcon className="w-12 h-12 text-indigo-500" />}
           action={
-            <Link to="/events" className="btn-primary">Explore Events</Link>
+            <Link to="/events" className="btn-primary">
+              Explore Events
+            </Link>
           }
         />
       </div>
@@ -85,27 +91,33 @@ export function MyEvents() {
   }
 
   return (
-    <motion.div 
-      initial="hidden" 
-      animate="visible" 
+    <motion.div
+      initial="hidden"
+      animate="visible"
       className="px-3 py-4 md:p-10 bg-slate-50/30"
     >
       <div className="max-w-7xl mx-auto">
-        
         {/* Header Section */}
-        <motion.div variants={fadeInUp} className="mb-4 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <motion.div
+          variants={fadeInUp}
+          className="mb-4 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4"
+        >
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest rounded-full">
                 Personal Schedule
               </span>
               <span className="px-3 py-1 bg-violet-100 text-violet-700 text-[10px] font-black uppercase tracking-widest rounded-full">
-                {events.length} {archivedView ? 'Archived' : 'Upcoming'} {events.length === 1 ? 'Event' : 'Events'}
+                {events.length} Upcoming{" "}
+                {events.length === 1 ? "Event" : "Events"}
               </span>
             </div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none">My Events</h1>
+            <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none">
+              My Events
+            </h1>
             <p className="text-slate-500 mt-3 text-lg font-medium flex items-center">
-              Manage your personal time and {archivedView ? 'past' : 'upcoming'} activities <SparklesIcon className="w-5 h-5 ml-2 text-amber-400" />
+              Manage your personal time and upcoming activities{" "}
+              <SparklesIcon className="w-5 h-5 ml-2 text-amber-400" />
             </p>
           </div>
 
@@ -115,37 +127,13 @@ export function MyEvents() {
           >
             Find more events
             <div className="ml-3 p-1.5 bg-indigo-50 rounded-lg group-hover:translate-x-1 transition-transform">
-               <MagnifyingGlassIcon className="w-4 h-4" />
+              <MagnifyingGlassIcon className="w-4 h-4" />
             </div>
           </Link>
         </motion.div>
 
-        {/* Active / Archive toggle */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setArchivedView(false)}
-            className={`px-4 py-2 rounded-2xl text-sm font-black border transition-all ${
-              !archivedView
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
-            }`}
-          >
-            Upcoming
-          </button>
-          <button
-            onClick={() => setArchivedView(true)}
-            className={`px-4 py-2 rounded-2xl text-sm font-black border transition-all ${
-              archivedView
-                ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
-                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
-            }`}
-          >
-            Archived
-          </button>
-        </div>
-        
         {/* Calendar Container */}
-        <motion.div 
+        <motion.div
           variants={fadeInUp}
           className="bg-white p-3 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden"
         >
@@ -157,7 +145,7 @@ export function MyEvents() {
         </motion.div>
 
         {/* Footer info */}
-        <motion.p 
+        <motion.p
           variants={fadeInUp}
           className="mt-4 md:mt-8 text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] opacity-50"
         >

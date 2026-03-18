@@ -54,7 +54,7 @@ export function CreateEvent() {
         </button>
 
         <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-100/50 border border-slate-100 overflow-hidden">
-          <div className="p-0 md:p-5">
+          <div className="p-6 md:p-10">
             {/* Section Header */}
             <div className="flex items-center space-x-4 mb-6">
               <div className="bg-indigo-600 p-3 md:p-4 rounded-[1.25rem] shadow-lg shadow-indigo-200 shrink-0">
