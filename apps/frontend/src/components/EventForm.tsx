@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../api/api';
 import { PrimaryButton } from './PrimaryButton';
-
-interface Tag {
-  id: string;
-  name: string;
-}
+import type { Tag } from '../types/tag';
+import { TagSelector } from './tags/TagSelector';
 
 interface EventFormProps {
   initialData?: any;
@@ -43,14 +40,6 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const toggleTag = (tagId: string) => {
-    setSelectedTagIds(prev => {
-      if (prev.includes(tagId)) return prev.filter(id => id !== tagId);
-      if (prev.length >= 5) return prev;
-      return [...prev, tagId];
-    });
-  };
-
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,16 +54,6 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
 
   const inputClasses = "w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none text-slate-700 placeholder:text-slate-400 font-medium";
   const labelClasses = "block text-sm font-black text-slate-700 mb-2 ml-1 uppercase tracking-wide";
-
-  const TAG_COLORS: Record<string, string> = {
-    Tech:     'bg-blue-100 text-blue-700 border-blue-200',
-    Art:      'bg-pink-100 text-pink-700 border-pink-200',
-    Business: 'bg-amber-100 text-amber-700 border-amber-200',
-    Music:    'bg-purple-100 text-purple-700 border-purple-200',
-    Sport:    'bg-green-100 text-green-700 border-green-200',
-    Food:     'bg-orange-100 text-orange-700 border-orange-200',
-    Other:    'bg-slate-100 text-slate-700 border-slate-200',
-  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 md:space-y-6">
@@ -182,27 +161,12 @@ export function EventForm({ initialData, onSubmit, buttonText, availableTags: pr
               {selectedTagIds.length}/5 selected
             </span>
           </label>
-          <div className="flex flex-wrap gap-2 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-            {availableTags.map(tag => {
-              const isSelected = selectedTagIds.includes(tag.id);
-              const colorClass = TAG_COLORS[tag.name] || TAG_COLORS['Other'];
-              return (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => toggleTag(tag.id)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
-                    isSelected
-                      ? `${colorClass} shadow-sm scale-105`
-                      : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  {isSelected && <span className="mr-1">✓</span>}
-                  {tag.name}
-                </button>
-              );
-            })}
-          </div>
+          <TagSelector
+            availableTags={availableTags}
+            selectedTagIds={selectedTagIds}
+            onChangeSelectedTagIds={setSelectedTagIds}
+            maxSelected={5}
+          />
         </div>
       )}
 
