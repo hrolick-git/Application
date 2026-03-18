@@ -258,7 +258,7 @@ export function EventsList() {
             {/* Infinite scroll trigger */}
             {visibleCount < filteredEvents.length && (
               <div ref={loaderRef} className="flex justify-center py-8">
-                <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+                <Loader />
               </div>
             )}
           </>

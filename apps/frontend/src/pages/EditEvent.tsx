@@ -4,6 +4,7 @@ import api from "../api/api";
 import { EventForm } from "../components/EventForm";
 import { PencilSquareIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
+import { Loader } from "../components/Loader";
 
 export function EditEvent() {
   const { id } = useParams();
@@ -76,7 +77,7 @@ export function EditEvent() {
   if (!initialData)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <Loader />
       </div>
     );
 

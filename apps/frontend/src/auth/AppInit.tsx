@@ -15,7 +15,8 @@ export function AppInit({ children }: { children: ReactNode }) {
       return;
     }
 
-    api.get("/users/me") // fetch user from backend
+    api
+      .get("/users/me") // fetch user from backend
       .then((res) => setUser(res.data))
       .catch(() => {
         localStorage.removeItem("token");
