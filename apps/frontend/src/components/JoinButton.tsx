@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import api from '../api/api';
-import { useStore } from '../store/useStore';
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
+import api from "../api/api";
+import { useStore } from "../store/useStore";
 
 interface JoinButtonProps {
   event: any;
@@ -9,52 +9,62 @@ interface JoinButtonProps {
   className?: string; // for additional styling if needed
 }
 
-export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps) {
+export function JoinButton({
+  event,
+  onRefresh,
+  className = "",
+}: JoinButtonProps) {
   const user = useStore((s) => s.user);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isPrivate = event.visibility === 'PRIVATE';
-  const isJoined = !!user && (
-    event.joined || 
-    event.participants?.some((p: any) => 
-      (typeof p === 'string' ? p === user?.id : p.user?.email === user?.email)
-    )
-  );
-  const isFull = event.capacity ? event.participants?.length >= event.capacity : false;
-  const isArchived = !!event.isArchived;
+  const isPrivate = event.visibility === "PRIVATE";
+  const isJoined =
+    !!user &&
+    (event.joined ||
+      event.participants?.some((p: any) =>
+        typeof p === "string" ? p === user?.id : p.user?.email === user?.email,
+      ));
+  const isFull = event.capacity
+    ? event.participants?.length >= event.capacity
+    : false;
+  const isArchived =
+    !!event.isArchived ||
+    (event.endsAt
+      ? new Date(event.endsAt) < new Date()
+      : new Date(event.startsAt) < new Date());
 
   const isDisabled = isArchived || (isFull && !isJoined) || isLoading;
 
   const baseClasses =
-    'w-full py-4 rounded-[1.25rem] font-black text-sm transition-all duration-300 transform active:scale-95';
+    "w-full py-4 rounded-[1.25rem] font-black text-sm transition-all duration-300 transform active:scale-95";
 
-  const stateClasses = isJoined
-    ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 shadow-none'
-    : isFull
-      ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
-      : isArchived
-        ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
-      : isPrivate
-        ? 'bg-purple-700 text-white hover:bg-purple-800 shadow-purple-200 hover:-translate-y-1 shadow-xl'
-        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200 hover:-translate-y-1 shadow-xl';
+  const stateClasses = isArchived
+    ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none" // Архів завжди сірий
+    : isJoined
+      ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 shadow-none"
+      : isFull
+        ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
+        : isPrivate
+          ? "bg-purple-700 text-white hover:bg-purple-800 shadow-purple-200 hover:-translate-y-1 shadow-xl"
+          : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200 hover:-translate-y-1 shadow-xl";
 
   const label = isLoading
-    ? 'Processing...'
-    : isJoined
-      ? 'Leave Event'
-      : isFull
-        ? 'Event Full'
-        : isArchived
-          ? 'Archived'
-        : isPrivate
-          ? 'Private Join'
-          : 'Join Event';
+    ? "Processing..."
+    : isArchived
+      ? "Archived"
+      : isJoined
+        ? "Leave Event"
+        : isFull
+          ? "Event Full"
+          : isPrivate
+            ? "Private Join"
+            : "Join Event";
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault(); // if this button is inside a Link, prevent navigation
 
-    const token = localStorage.getItem('token');
-    if (!token) return toast.error('You must be logged in to join an event');;
+    const token = localStorage.getItem("token");
+    if (!token) return toast.error("You must be logged in to join an event");
 
     try {
       setIsLoading(true);
@@ -66,7 +76,7 @@ export function JoinButton({ event, onRefresh, className = "" }: JoinButtonProps
       onRefresh(); // call to refresh data in the parent component
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || 'Action failed');
+      toast.error(err.response?.data?.message || "Action failed");
     } finally {
       setIsLoading(false);
     }
