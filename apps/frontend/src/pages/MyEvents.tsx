@@ -26,6 +26,7 @@ export function MyEvents() {
 
   useEffect(() => {
     (async () => {
+      setLoaded(false);
       try {
         const res = await api.get("/users/me/events", { params: { archived: archivedView }, withCredentials: true });
         
@@ -68,8 +69,12 @@ export function MyEvents() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <EmptyState 
-          title="Your calendar is empty"
-          message="You haven't joined any events yet. Explore our community and find something exciting!"
+          title={archivedView ? "No archived events" : "Your calendar is empty"}
+          message={
+            archivedView
+              ? "You don't have any past events yet."
+              : "You haven't joined any events yet. Explore our community and find something exciting!"
+          }
           icon={<CalendarIcon className="w-12 h-12 text-indigo-500" />}
           action={
             <Link to="/events" className="btn-primary">Explore Events</Link>
@@ -95,12 +100,12 @@ export function MyEvents() {
                 Personal Schedule
               </span>
               <span className="px-3 py-1 bg-violet-100 text-violet-700 text-[10px] font-black uppercase tracking-widest rounded-full">
-                {events.length} Upcoming {events.length === 1 ? 'Event' : 'Events'}
+                {events.length} {archivedView ? 'Archived' : 'Upcoming'} {events.length === 1 ? 'Event' : 'Events'}
               </span>
             </div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none">My Events</h1>
             <p className="text-slate-500 mt-3 text-lg font-medium flex items-center">
-              Manage your personal time and upcoming activities <SparklesIcon className="w-5 h-5 ml-2 text-amber-400" />
+              Manage your personal time and {archivedView ? 'past' : 'upcoming'} activities <SparklesIcon className="w-5 h-5 ml-2 text-amber-400" />
             </p>
           </div>
 

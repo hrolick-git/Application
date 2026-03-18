@@ -104,9 +104,10 @@ export function EventsList() {
   // Reset visible count on filter change
   useEffect(() => {
     setVisibleCount(EVENTS_PER_PAGE);
-  }, [searchQuery, selectedTags]);
+  }, [searchQuery, selectedTags, archivedView]);
 
   const fetchEvents = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const res = token
@@ -243,11 +244,13 @@ export function EventsList() {
         ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <EmptyState
-              title="No events found"
+              title={archivedView ? "No archived events" : "No events found"}
               message={
                 selectedTags.length > 0
                   ? "No events match the selected tags."
-                  : `We couldn't find any events matching "${searchQuery}".`
+                  : archivedView
+                    ? "No past events yet."
+                    : `We couldn't find any events matching "${searchQuery}".`
               }
               action={
                 <button
