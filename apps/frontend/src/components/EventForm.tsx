@@ -100,9 +100,9 @@ export function EventForm({
         />
       </div>
 
-      <div className="w-full max-w-sm">
+      <div className="w-full md:w-72 space-y-4">
         {/* Starts At */}
-        <div className="w-full min-w-0">
+        <div className="relative w-full">
           <FieldLabel>Starts At</FieldLabel>
           <TextField
             required
@@ -115,7 +115,7 @@ export function EventForm({
         </div>
 
         {/* Ends At */}
-        <div className="w-full min-w-0">
+        <div className="relative w-full">
           <FieldLabel>Ends At (Optional)</FieldLabel>
           <TextField
             type="datetime-local"
@@ -169,7 +169,7 @@ export function EventForm({
 
       {/* Tags */}
       {availableTags.length > 0 && (
-        <div>
+        <div className="py-3">
           <FieldLabel>
             Tags
             <span className="ml-2 text-xs font-medium text-slate-400 normal-case tracking-normal">
