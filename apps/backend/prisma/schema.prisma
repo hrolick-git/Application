@@ -28,6 +28,7 @@ model Event {
   location    String
   capacity    Int?
   visibility  Visibility    @default(PUBLIC)
+  shareToken  String?       @unique
   organizer   User          @relation("organizer", fields: [organizerId], references: [id])
   organizerId String
   participants Participant[]

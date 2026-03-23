@@ -12,6 +12,7 @@ import {
   TrashIcon,
   PencilSquareIcon,
   LockClosedIcon,
+  LinkIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 
@@ -29,6 +30,7 @@ interface Event {
   location: string;
   capacity?: number;
   visibility: "PUBLIC" | "PRIVATE";
+  shareToken?: string;
   participants: { user: { email: string } }[] | undefined;
   organizerId: string;
   joined?: boolean;
@@ -47,7 +49,7 @@ const TAG_COLORS: Record<string, string> = {
 };
 
 export function EventDetails() {
-  const { id } = useParams();
+  const { id, shareToken } = useParams();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -56,6 +58,12 @@ export function EventDetails() {
   const fetch = async () => {
     try {
       setLoading(true);
+      if (shareToken) {
+        const res = await api.get(`/events/shared/${shareToken}`);
+        setEvent(res.data);
+        return;
+      }
+
       const token = localStorage.getItem("token");
       const res = await api.get(
         token ? `/events/${id}` : `/events/public/${id}`,
@@ -63,7 +71,7 @@ export function EventDetails() {
       setEvent(res.data);
     } catch (err: any) {
       console.error("Fetch error:", err);
-      if (err.response?.status === 401) {
+      if (!shareToken && err.response?.status === 401) {
         const publicRes = await api.get(`/events/public/${id}`);
         setEvent(publicRes.data);
       } else {
@@ -76,7 +84,27 @@ export function EventDetails() {
 
   useEffect(() => {
     fetch();
-  }, [id]);
+  }, [id, shareToken]);
+
+  const copyShareLink = async () => {
+    if (typeof window === "undefined") return;
+
+    try {
+      let token = shareToken || event?.shareToken;
+      if (!token && event?.id && event.visibility === "PRIVATE") {
+        const res = await api.post(`/events/${event.id}/share-link`);
+        token = res.data?.shareToken;
+      }
+      if (!token) throw new Error("No share token returned");
+
+      await navigator.clipboard.writeText(
+        `${window.location.origin}/events/shared/${token}`,
+      );
+      toast.success("Shared link copied");
+    } catch {
+      toast.error("Failed to copy shared link");
+    }
+  };
 
   const del = async () => {
     if (!event) return;
@@ -99,7 +127,7 @@ export function EventDetails() {
   const tags = event.tags || [];
 
   return (
-    <div className="bg-slate-50/30 py-4 md:p-6">
+    <div className="bg-slate-50/30 py-4 md:p-10">
       <div className="max-w-3xl mx-auto">
         {/* Back button */}
         <button
@@ -159,7 +187,18 @@ export function EventDetails() {
               {/* Organizer Actions */}
               {isOrganizer && (
                 <div className="flex gap-2 shrink-0">
+                  {isPrivate && (
+                    <button
+                      type="button"
+                      onClick={copyShareLink}
+                      className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition-colors"
+                      title="Copy shared link"
+                    >
+                      <LinkIcon className="w-6 h-6" />
+                    </button>
+                  )}
                   <button
+                    type="button"
                     onClick={() => navigate(`/events/${id}/edit`)}
                     className="p-3 bg-amber-50 text-amber-600 rounded-2xl hover:bg-amber-100 transition-colors"
                     title="Edit"
@@ -167,6 +206,7 @@ export function EventDetails() {
                     <PencilSquareIcon className="w-6 h-6" />
                   </button>
                   <button
+                    type="button"
                     onClick={del}
                     className="p-3 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-100 transition-colors"
                     title="Delete"
@@ -264,6 +304,7 @@ export function EventDetails() {
                 <JoinButton
                   event={event}
                   onRefresh={fetch}
+                  shareToken={shareToken}
                   className="py-5 text-lg"
                 />
               </div>

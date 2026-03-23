@@ -5,6 +5,7 @@ export const TAG_COLOR_CLASSES: Record<string, string> = {
   Music: 'bg-purple-100 text-purple-700 border-purple-200',
   Sport: 'bg-green-100 text-green-700 border-green-200',
   Food: 'bg-orange-100 text-orange-700 border-orange-200',
+  Game: 'bg-red-100 text-red-700 border-red-200',
   Other: 'bg-slate-100 text-slate-700 border-slate-200',
 };
 

@@ -75,7 +75,12 @@ export const useStore = create<State>()(
       fetchTags: async () => {
         try {
           const res = await api.get('/events/tags');
-          set({ tags: res.data });
+          const sorted = [...res.data].sort((a: { name: string }, b: { name: string }) => {
+            if (a.name === 'Other') return 1;
+            if (b.name === 'Other') return -1;
+            return 0;
+          });
+          set({ tags: sorted });
         } catch (error) {
           console.error("Error fetching tags:", error);
         }

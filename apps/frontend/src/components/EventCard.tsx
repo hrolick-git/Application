@@ -1,6 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { PencilSquareIcon, MapPinIcon, CalendarDaysIcon, UsersIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, MapPinIcon, CalendarDaysIcon, UsersIcon, LockClosedIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { JoinButton } from './JoinButton';
+import { toast } from 'react-hot-toast';
+import api from '../api/api';
 
 interface Tag {
   id: string;
@@ -28,6 +30,24 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
   const isPrivate = e.visibility === 'PRIVATE';
   const tags: Tag[] = e.tags || [];
 
+  const copyShareLink = async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      let token = e.shareToken;
+      if (!token) {
+        const res = await api.post(`/events/${e.id}/share-link`);
+        token = res.data?.shareToken;
+      }
+      if (!token) throw new Error('No share token returned');
+
+      await navigator.clipboard.writeText(`${window.location.origin}/events/shared/${token}`);
+      toast.success('Shared link copied');
+    } catch {
+      toast.error('Failed to copy shared link');
+    }
+  };
+
   return (
     <div className={`group relative rounded-[2.5rem] p-7 shadow-sm hover:shadow-2xl transition-all duration-500 border flex flex-col h-full min-h-[340px] ${
       isPrivate 
@@ -45,14 +65,27 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
           </Link>
           
           {isOrganizer && (
-            <button
-              onClick={() => navigate(`/events/${e.id}/edit`)}
-              className={`p-2.5 rounded-2xl transition-all shrink-0 hover:rotate-12 ${
-                isPrivate ? 'text-purple-500 hover:bg-purple-100/50' : 'text-amber-500 hover:bg-amber-50'
-              }`}
-            >
-              <PencilSquareIcon className="w-6 h-6" />
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              {isPrivate && (
+                <button
+                  type="button"
+                  onClick={copyShareLink}
+                  className="p-2.5 rounded-2xl transition-all text-indigo-500 hover:bg-indigo-50"
+                  title="Copy shared link"
+                >
+                  <LinkIcon className="w-6 h-6" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => navigate(`/events/${e.id}/edit`)}
+                className={`p-2.5 rounded-2xl transition-all hover:rotate-12 ${
+                  isPrivate ? 'text-purple-500 hover:bg-purple-100/50' : 'text-amber-500 hover:bg-amber-50'
+                }`}
+              >
+                <PencilSquareIcon className="w-6 h-6" />
+              </button>
+            </div>
           )}
         </div>
 

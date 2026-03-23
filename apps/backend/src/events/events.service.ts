@@ -3,11 +3,72 @@ import {
   ForbiddenException,
   NotFoundException,
 } from "@nestjs/common";
+import { randomBytes } from "crypto";
 import { PrismaService } from "../prisma.service";
 
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
+
+  private createShareToken() {
+    return randomBytes(24).toString("hex");
+  }
+
+  private isArchived(event: any, now = new Date()) {
+    const endOrStart = event.endsAt
+      ? new Date(event.endsAt)
+      : new Date(event.startsAt);
+    return endOrStart.getTime() < now.getTime();
+  }
+
+  private isPrivateEventAccessible(event: any, userId?: string) {
+    return !!userId && (
+      event.organizerId === userId ||
+      event.participants.some((participant: any) => participant.userId === userId)
+    );
+  }
+
+  private serializeEvent(event: any, userId?: string, now = new Date()) {
+    const plainEvent = JSON.parse(JSON.stringify(event));
+    const { shareToken, ...eventData } = plainEvent;
+    const includeShareToken =
+      !!userId &&
+      eventData.visibility === "PRIVATE" &&
+      eventData.organizerId === userId &&
+      !!shareToken;
+
+    return {
+      ...eventData,
+      joined: userId
+        ? eventData.participants.some((participant: any) => participant.userId === userId)
+        : false,
+      isArchived: this.isArchived(eventData, now),
+      tags: eventData.tags.map((eventTag: any) => eventTag.tag),
+      ...(includeShareToken ? { shareToken } : {}),
+    };
+  }
+
+  private async ensureShareTokenForPrivateOrganizerEvent(event: any, userId?: string) {
+    if (
+      !userId ||
+      event.visibility !== "PRIVATE" ||
+      event.organizerId !== userId ||
+      !!event.shareToken
+    ) {
+      return event;
+    }
+
+    const updatedEvent = await this.prisma.event.update({
+      where: { id: event.id },
+      data: { shareToken: this.createShareToken() },
+      include: {
+        participants: { include: { user: true } },
+        tags: { include: { tag: true } },
+      },
+    });
+
+    return updatedEvent;
+  }
 
   private buildArchiveWhere(archived: boolean, now = new Date()) {
     const archivedOrActive = archived
@@ -18,18 +79,7 @@ export class EventsService {
   }
 
   private withComputedFlags(events: any[], userId?: string, now = new Date()) {
-    return JSON.parse(JSON.stringify(events)).map((e: any) => {
-      const endOrStart = e.endsAt ? new Date(e.endsAt) : new Date(e.startsAt);
-      const isArchived = endOrStart.getTime() < now.getTime();
-      return {
-        ...e,
-        joined: userId
-          ? e.participants.some((p: any) => p.userId === userId)
-          : false,
-        isArchived,
-        tags: e.tags.map((et: any) => et.tag),
-      };
-    });
+    return events.map((event: any) => this.serializeEvent(event, userId, now));
   }
 
   async list(userId?: string, tagIds?: string[], archived = false) {
@@ -38,15 +88,21 @@ export class EventsService {
       OR: [
         { visibility: "PUBLIC" as const },
         ...(userId ? [{ organizerId: userId }] : []),
+        ...(userId
+          ? [{ visibility: "PRIVATE" as const, participants: { some: { userId } } }]
+          : []),
       ],
     };
     const tagsWhere = tagIds?.length
       ? { tags: { some: { tagId: { in: tagIds } } } }
-      : {};
+      : null;
+    const whereClauses = tagsWhere
+      ? [accessWhere, this.buildArchiveWhere(archived, now), tagsWhere]
+      : [accessWhere, this.buildArchiveWhere(archived, now)];
 
     const events = await this.prisma.event.findMany({
       where: {
-        AND: [accessWhere, this.buildArchiveWhere(archived, now), tagsWhere],
+        AND: whereClauses,
       },
       orderBy: { startsAt: "asc" },
       include: {
@@ -59,7 +115,7 @@ export class EventsService {
   }
 
   async get(id: string, userId?: string) {
-    const event = await this.prisma.event.findUnique({
+    let event = await this.prisma.event.findUnique({
       where: { id },
       include: {
         participants: { include: { user: true } },
@@ -68,17 +124,32 @@ export class EventsService {
     });
     if (!event) throw new NotFoundException("Event not found");
 
-    if (event.visibility === "PRIVATE") {
-      const ok =
-        event.organizerId === userId ||
-        event.participants.some((p: any) => p.userId === userId);
-      if (!ok) throw new ForbiddenException("Access denied");
+    if (
+      event.visibility === "PRIVATE" &&
+      !this.isPrivateEventAccessible(event, userId)
+    ) {
+      throw new ForbiddenException("Access denied");
     }
 
-    return {
-      ...event,
-      tags: event.tags.map((et: any) => et.tag),
-    };
+    event = await this.ensureShareTokenForPrivateOrganizerEvent(event, userId);
+
+    return this.serializeEvent(event, userId);
+  }
+
+  async findSharedEvent(shareToken: string) {
+    const event = await this.prisma.event.findUnique({
+      where: { shareToken },
+      include: {
+        participants: { include: { user: true } },
+        tags: { include: { tag: true } },
+      },
+    });
+
+    if (!event || event.visibility !== "PRIVATE") {
+      throw new NotFoundException("Event not found");
+    }
+
+    return this.serializeEvent(event);
   }
 
   async create(data: any, userId: string) {
@@ -92,6 +163,8 @@ export class EventsService {
       data: {
         ...eventData,
         organizerId: userId,
+        shareToken:
+          eventData.visibility === "PRIVATE" ? this.createShareToken() : null,
         ...(tagIds?.length
           ? {
               tags: {
@@ -114,6 +187,11 @@ export class EventsService {
       throw new ForbiddenException("Access denied");
 
     const { tagIds, ...eventData } = data;
+    const nextVisibility = eventData.visibility ?? event.visibility;
+    const shareTokenData =
+      nextVisibility === "PRIVATE"
+        ? { shareToken: event.shareToken ?? this.createShareToken() }
+        : { shareToken: null };
 
     if (tagIds !== undefined) {
       // видалити старі теги і додати нові
@@ -127,7 +205,10 @@ export class EventsService {
 
     return this.prisma.event.update({
       where: { id },
-      data: eventData,
+      data: {
+        ...eventData,
+        ...shareTokenData,
+      },
       include: {
         participants: true,
         tags: { include: { tag: true } },
@@ -149,11 +230,62 @@ export class EventsService {
       include: { participants: true },
     });
     if (!event) throw new NotFoundException("Event not found");
+    if (
+      event.visibility === "PRIVATE" &&
+      event.organizerId !== userId &&
+      !event.participants.some((participant) => participant.userId === userId)
+    ) {
+      throw new ForbiddenException("Access denied");
+    }
     if (event.capacity && event.participants.length >= event.capacity) {
       throw new ForbiddenException("Event is full");
     }
     if (event.participants.some((p) => p.userId === userId)) return event;
     return this.prisma.participant.create({ data: { eventId: id, userId } });
+  }
+
+  async joinByShareToken(shareToken: string, userId: string) {
+    const event = await this.prisma.event.findUnique({
+      where: { shareToken },
+      include: { participants: true },
+    });
+
+    if (!event || event.visibility !== "PRIVATE") {
+      throw new NotFoundException("Event not found");
+    }
+    if (event.capacity && event.participants.length >= event.capacity) {
+      throw new ForbiddenException("Event is full");
+    }
+    if (event.participants.some((participant) => participant.userId === userId)) {
+      return event;
+    }
+
+    return this.prisma.participant.create({
+      data: { eventId: event.id, userId },
+    });
+  }
+
+  async getOrCreateShareToken(id: string, userId: string) {
+    const event = await this.prisma.event.findUnique({ where: { id } });
+    if (!event) throw new NotFoundException("Event not found");
+    if (event.organizerId !== userId) {
+      throw new ForbiddenException("Access denied");
+    }
+    if (event.visibility !== "PRIVATE") {
+      throw new ForbiddenException("Share link is available only for private events");
+    }
+
+    if (event.shareToken) {
+      return { shareToken: event.shareToken };
+    }
+
+    const updated = await this.prisma.event.update({
+      where: { id },
+      data: { shareToken: this.createShareToken() },
+      select: { shareToken: true },
+    });
+
+    return { shareToken: updated.shareToken };
   }
 
   async leave(id: string, userId: string) {
@@ -166,15 +298,14 @@ export class EventsService {
     const now = new Date();
     const tagsWhere = tagIds?.length
       ? { tags: { some: { tagId: { in: tagIds } } } }
-      : {};
+      : null;
+    const whereClauses = tagsWhere
+      ? [{ visibility: "PUBLIC" as const }, this.buildArchiveWhere(archived, now), tagsWhere]
+      : [{ visibility: "PUBLIC" as const }, this.buildArchiveWhere(archived, now)];
 
     const events = await this.prisma.event.findMany({
       where: {
-        AND: [
-          { visibility: "PUBLIC" as const },
-          this.buildArchiveWhere(archived, now),
-          tagsWhere,
-        ],
+        AND: whereClauses,
       },
       orderBy: { startsAt: "asc" },
       include: {
@@ -199,10 +330,7 @@ export class EventsService {
       },
     });
     if (!event) return null;
-    return {
-      ...event,
-      tags: event.tags.map((et: any) => et.tag),
-    };
+    return this.serializeEvent(event);
   }
 
   /** Get all available tags */

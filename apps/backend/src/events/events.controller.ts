@@ -44,6 +44,12 @@ export class EventsController {
     return event;
   }
 
+  /** Private event by shared link */
+  @Get('shared/:shareToken')
+  async sharedEvent(@Param('shareToken') shareToken: string) {
+    return this.events.findSharedEvent(shareToken);
+  }
+
   /** Get all tags */
   @Get('tags')
   async getTags() {
@@ -99,6 +105,20 @@ export class EventsController {
   @Post(':id/join')
   async join(@Param('id') id: string, @Req() req: any) {
     return this.events.join(id, req.user.id);
+  }
+
+  /** Join private event by shared link */
+  @UseGuards(JwtAuthGuard)
+  @Post('shared/:shareToken/join')
+  async joinByShareToken(@Param('shareToken') shareToken: string, @Req() req: any) {
+    return this.events.joinByShareToken(shareToken, req.user.id);
+  }
+
+  /** Get or create share link token (only private event organizer) */
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/share-link')
+  async getOrCreateShareLink(@Param('id') id: string, @Req() req: any) {
+    return this.events.getOrCreateShareToken(id, req.user.id);
   }
 
   /** Leave */

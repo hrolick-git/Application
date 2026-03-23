@@ -23,18 +23,24 @@ let EventsController = class EventsController {
     constructor(events) {
         this.events = events;
     }
-    async publicList() {
-        return this.events.findPublicEvents();
+    async publicList(archived) {
+        return this.events.findPublicEvents(undefined, archived === 'true');
     }
     async publicEvent(id) {
         const event = await this.events.findById(id);
         if (!event || event.visibility !== 'PUBLIC') {
-            throw new common_1.NotFoundException('Подія не знайдена');
+            throw new common_1.NotFoundException('Event not found');
         }
         return event;
     }
-    async list(req) {
-        return this.events.list(req.user.id);
+    async sharedEvent(shareToken) {
+        return this.events.findSharedEvent(shareToken);
+    }
+    async getTags() {
+        return this.events.getTags();
+    }
+    async list(req, archived) {
+        return this.events.list(req.user.id, undefined, archived === 'true');
     }
     async getById(id, req) {
         return this.events.get(id, req.user.id);
@@ -51,6 +57,12 @@ let EventsController = class EventsController {
     async join(id, req) {
         return this.events.join(id, req.user.id);
     }
+    async joinByShareToken(shareToken, req) {
+        return this.events.joinByShareToken(shareToken, req.user.id);
+    }
+    async getOrCreateShareLink(id, req) {
+        return this.events.getOrCreateShareToken(id, req.user.id);
+    }
     async leave(id, req) {
         return this.events.leave(id, req.user.id);
     }
@@ -58,8 +70,9 @@ let EventsController = class EventsController {
 exports.EventsController = EventsController;
 __decorate([
     (0, common_1.Get)('public'),
+    __param(0, (0, common_1.Query)('archived')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "publicList", null);
 __decorate([
@@ -70,11 +83,25 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "publicEvent", null);
 __decorate([
+    (0, common_1.Get)('shared/:shareToken'),
+    __param(0, (0, common_1.Param)('shareToken')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "sharedEvent", null);
+__decorate([
+    (0, common_1.Get)('tags'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "getTags", null);
+__decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('archived')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "list", null);
 __decorate([
@@ -124,6 +151,24 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "join", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('shared/:shareToken/join'),
+    __param(0, (0, common_1.Param)('shareToken')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "joinByShareToken", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)(':id/share-link'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "getOrCreateShareLink", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(':id/leave'),

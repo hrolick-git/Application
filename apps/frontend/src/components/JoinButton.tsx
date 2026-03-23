@@ -7,12 +7,14 @@ interface JoinButtonProps {
   event: any;
   onRefresh: () => void;
   className?: string; // for additional styling if needed
+  shareToken?: string;
 }
 
 export function JoinButton({
   event,
   onRefresh,
   className = "",
+  shareToken,
 }: JoinButtonProps) {
   const user = useStore((s) => s.user);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +72,8 @@ export function JoinButton({
       setIsLoading(true);
       if (isJoined) {
         await api.post(`/events/${event.id}/leave`);
+      } else if (isPrivate && shareToken) {
+        await api.post(`/events/shared/${shareToken}/join`);
       } else {
         await api.post(`/events/${event.id}/join`);
       }

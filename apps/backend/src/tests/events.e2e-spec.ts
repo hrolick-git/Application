@@ -14,6 +14,8 @@ describe('Events (e2e)', () => {
   let token: string;
   let otherToken: string;
   let eventId: string;
+  let privateEventId: string;
+  let privateShareToken: string;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -89,6 +91,26 @@ describe('Events (e2e)', () => {
     if (!eventId) throw new Error('Missing event id');
   });
 
+  it('/events (POST) — creates private event with share token', async () => {
+    const future = new Date(Date.now() + 1000 * 60 * 120).toISOString();
+    const res = await request(app.getHttpServer())
+      .post('/events')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'Private Event',
+        startsAt: future,
+        location: 'Lviv',
+        visibility: 'PRIVATE',
+      })
+      .expect(201);
+
+    privateEventId = res.body.id;
+    privateShareToken = res.body.shareToken;
+
+    if (!privateEventId) throw new Error('Missing private event id');
+    if (!privateShareToken) throw new Error('Missing private share token');
+  });
+
   it('/events (POST) — returns 401 without token', () => {
     const future = new Date(Date.now() + 1000 * 60 * 60).toISOString();
     return request(app.getHttpServer())
@@ -143,6 +165,23 @@ describe('Events (e2e)', () => {
       .expect(404);
   });
 
+  it('/events/:id (GET) — blocks private event for another user', () => {
+    return request(app.getHttpServer())
+      .get(`/events/${privateEventId}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(403);
+  });
+
+  it('/events/shared/:shareToken (GET) — returns private event by shared link without auth', () => {
+    return request(app.getHttpServer())
+      .get(`/events/shared/${privateShareToken}`)
+      .expect(200)
+      .expect((res) => {
+        if (res.body.id !== privateEventId) throw new Error('Wrong private event id');
+        if (res.body.shareToken) throw new Error('Share token must not be exposed');
+      });
+  });
+
   // ─── Update ──────────────────────────────────────────────────────────────────
 
   it('/events/:id (PATCH) — organizer can update event', () => {
@@ -173,6 +212,37 @@ describe('Events (e2e)', () => {
       .expect(201);
   });
 
+  it('/events/:id/join (POST) — blocks joining private event without shared link', () => {
+    return request(app.getHttpServer())
+      .post(`/events/${privateEventId}/join`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(403);
+  });
+
+  it('/events/shared/:shareToken/join (POST) — user can join private event via shared link', () => {
+    return request(app.getHttpServer())
+      .post(`/events/shared/${privateShareToken}/join`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(201);
+  });
+
+  it('/events/:id (GET) — joined user can access private event by id', () => {
+    return request(app.getHttpServer())
+      .get(`/events/${privateEventId}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(200)
+      .expect((res) => {
+        if (res.body.id !== privateEventId) throw new Error('Wrong private event id after join');
+      });
+  });
+
+  it('/events/:id/leave (POST) — user can leave private event after shared join', () => {
+    return request(app.getHttpServer())
+      .post(`/events/${privateEventId}/leave`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(201);
+  });
+
   it('/events/:id/leave (POST) — user can leave event', () => {
     return request(app.getHttpServer())
       .post(`/events/${eventId}/leave`)
@@ -192,6 +262,13 @@ describe('Events (e2e)', () => {
   it('/events/:id (DELETE) — organizer can delete event', () => {
     return request(app.getHttpServer())
       .delete(`/events/${eventId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+  });
+
+  it('/events/:id (DELETE) — organizer can delete private event', () => {
+    return request(app.getHttpServer())
+      .delete(`/events/${privateEventId}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
   });

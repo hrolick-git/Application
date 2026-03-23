@@ -18,13 +18,17 @@ export function Login() {
       const token = res.data.access_token;
       localStorage.setItem("token", token);
 
-      // 2. Update the ZUSTAND store (this is what was missing!)
-      // Extract the setUser function from the store
+      // 2. Update user in Zustand using fresh backend profile data
       const setUser = useStore.getState().setUser;
 
-      // Take the user from the backend response.
-      // If the backend is not updated yet, we use a fallback (temporary solution)
-      const userData = res.data.user || { email: data.email, id: "temp-id" };
+      let userData = res.data.user;
+      if (!userData?.id) {
+        const me = await api.get("/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        userData = me.data;
+      }
+
       setUser(userData);
 
       // 3. Redirect to the events page

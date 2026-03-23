@@ -69,13 +69,10 @@ export function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/events/shared/:shareToken" element={<EventDetails />} />
             <Route
               path="/events/:id"
-              element={
-                <ProtectedRoute>
-                  <EventDetails />
-                </ProtectedRoute>
-              }
+              element={<EventDetails />}
             />
             <Route
               path="/events/:id/edit"
