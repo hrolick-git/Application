@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { useStore } from "../store/useStore";
 import { Loader } from "../components/Loader";
@@ -49,6 +49,7 @@ interface Creator {
   id: string;
   email: string;
   name?: string | null;
+  creatorPageSlug?: string | null;
 }
 
 interface Event {
@@ -199,6 +200,11 @@ export function EventDetails() {
     event.organizer?.name?.trim() ||
     event.organizer?.email ||
     "Unknown";
+  const creatorPageHref = event.creator?.creatorPageSlug
+    ? `/creators/${event.creator.creatorPageSlug}`
+    : event.organizer?.creatorPageSlug
+      ? `/creators/${event.organizer.creatorPageSlug}`
+      : null;
   const hasUnsavedPreview =
     isOrganizer && previewTheme !== null && previewTheme !== savedSelection;
 
@@ -359,7 +365,17 @@ export function EventDetails() {
                 </h1>
 
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Created by: <span className="normal-case tracking-normal text-slate-600">{creatorLabel}</span>
+                  Created by:{" "}
+                  {creatorPageHref ? (
+                    <Link
+                      to={creatorPageHref}
+                      className="normal-case tracking-normal text-slate-600 underline decoration-slate-300 underline-offset-2 transition hover:text-indigo-600 hover:decoration-indigo-400"
+                    >
+                      {creatorLabel}
+                    </Link>
+                  ) : (
+                    <span className="normal-case tracking-normal text-slate-600">{creatorLabel}</span>
+                  )}
                 </p>
 
                 {/* Tags */}

@@ -30,6 +30,7 @@ interface Creator {
   id: string;
   email: string;
   name?: string | null;
+  creatorPageSlug?: string | null;
 }
 
 interface EventCardProps {
@@ -71,6 +72,7 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
   const tags: Tag[] = e.tags || [];
   const creator: Creator | null = e.creator || e.organizer || null;
   const creatorLabel = creator?.name?.trim() || creator?.email || 'Unknown';
+  const creatorPageHref = creator?.creatorPageSlug ? `/creators/${creator.creatorPageSlug}` : null;
 
   const copyShareLink = async () => {
     if (typeof window === 'undefined') return;
@@ -191,7 +193,17 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
         )}
 
         <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Created by: <span className="normal-case tracking-normal text-slate-600">{creatorLabel}</span>
+          Created by:{' '}
+          {creatorPageHref ? (
+            <Link
+              to={creatorPageHref}
+              className="normal-case tracking-normal text-slate-600 underline decoration-slate-300 underline-offset-2 transition hover:text-indigo-600 hover:decoration-indigo-400"
+            >
+              {creatorLabel}
+            </Link>
+          ) : (
+            <span className="normal-case tracking-normal text-slate-600">{creatorLabel}</span>
+          )}
         </p>
 
         {/* Tags */}

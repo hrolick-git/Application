@@ -7,6 +7,13 @@ import {
 import { randomBytes } from "crypto";
 import { PrismaService } from "../prisma.service";
 
+const organizerSelect = {
+  id: true,
+  email: true,
+  name: true,
+  creatorPage: { select: { slug: true } },
+} as const;
+
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
@@ -85,6 +92,7 @@ export class EventsService {
             id: organizer.id,
             email: organizer.email,
             name: organizer.name,
+            creatorPageSlug: organizer.creatorPage?.slug ?? null,
           }
         : null,
       ...(includeShareToken ? { shareToken } : {}),
@@ -106,7 +114,7 @@ export class EventsService {
       data: { shareToken: this.createShareToken() },
       include: {
         participants: { include: { user: true } },
-        organizer: { select: { id: true, email: true, name: true } },
+        organizer: { select: organizerSelect },
         tags: { include: { tag: true } },
       },
     });
@@ -151,7 +159,7 @@ export class EventsService {
       orderBy: { startsAt: "asc" },
       include: {
         participants: true,
-        organizer: { select: { id: true, email: true, name: true } },
+        organizer: { select: organizerSelect },
         tags: { include: { tag: true } },
       },
     });
@@ -164,7 +172,7 @@ export class EventsService {
       where: { id },
       include: {
         participants: { include: { user: true } },
-        organizer: { select: { id: true, email: true, name: true } },
+        organizer: { select: organizerSelect },
         tags: { include: { tag: true } },
       },
     });
@@ -187,7 +195,7 @@ export class EventsService {
       where: { shareToken },
       include: {
         participants: { include: { user: true } },
-        organizer: { select: { id: true, email: true, name: true } },
+        organizer: { select: organizerSelect },
         tags: { include: { tag: true } },
       },
     });
@@ -223,7 +231,7 @@ export class EventsService {
       },
       include: {
         participants: true,
-        organizer: { select: { id: true, email: true, name: true } },
+        organizer: { select: organizerSelect },
         tags: { include: { tag: true } },
       },
     });
@@ -262,7 +270,7 @@ export class EventsService {
       },
       include: {
         participants: true,
-        organizer: { select: { id: true, email: true, name: true } },
+        organizer: { select: organizerSelect },
         tags: { include: { tag: true } },
       },
     });
@@ -350,7 +358,7 @@ export class EventsService {
         where: { id },
         include: {
           participants: true,
-          organizer: { select: { id: true, email: true, name: true } },
+          organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
       });
@@ -379,7 +387,7 @@ export class EventsService {
           data: { colorTheme: null },
           include: {
             participants: true,
-            organizer: { select: { id: true, email: true, name: true } },
+            organizer: { select: organizerSelect },
             tags: { include: { tag: true } },
           },
         });
@@ -406,7 +414,7 @@ export class EventsService {
         data: { colorTheme: normalizedTheme },
         include: {
           participants: true,
-          organizer: { select: { id: true, email: true, name: true } },
+          organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
       });
@@ -433,7 +441,7 @@ export class EventsService {
         where: { id },
         include: {
           participants: true,
-          organizer: { select: { id: true, email: true, name: true } },
+          organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
       });
@@ -458,7 +466,7 @@ export class EventsService {
           data: { iconPattern: null },
           include: {
             participants: true,
-            organizer: { select: { id: true, email: true, name: true } },
+            organizer: { select: organizerSelect },
             tags: { include: { tag: true } },
           },
         });
@@ -480,7 +488,7 @@ export class EventsService {
         data: { iconPattern: normalizedPattern },
         include: {
           participants: true,
-          organizer: { select: { id: true, email: true, name: true } },
+          organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
       });
@@ -517,7 +525,7 @@ export class EventsService {
       orderBy: { startsAt: "asc" },
       include: {
         participants: true,
-        organizer: { select: { id: true, email: true, name: true } },
+        organizer: { select: organizerSelect },
         tags: { include: { tag: true } },
       },
     });
@@ -529,7 +537,7 @@ export class EventsService {
     const event = await this.prisma.event.findUnique({
       where: { id },
       include: {
-        organizer: { select: { email: true, id: true, name: true } },
+        organizer: { select: organizerSelect },
         participants: {
           include: {
             user: { select: { email: true, id: true } },
