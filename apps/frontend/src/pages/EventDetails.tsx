@@ -496,16 +496,21 @@ export function EventDetails() {
               <div className="bg-slate-50/50 rounded-[2rem] p-4 md:p-6 border border-slate-100">
                 {participantsList.length > 0 ? (
                   <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                    {participantsList.map((p, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-200 to-slate-300 flex items-center justify-center text-[10px] font-bold text-slate-600">
-                          {p.user.email[0].toUpperCase()}
+                    {participantsList.map((participant, idx) => {
+                      const participantEmail = participant?.user?.email || "Unknown participant";
+                      const participantInitial = participantEmail.charAt(0).toUpperCase() || "?";
+
+                      return (
+                        <div key={idx} className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-200 to-slate-300 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                            {participantInitial}
+                          </div>
+                          <span className="text-sm text-slate-600 truncate font-medium">
+                            {participantEmail}
+                          </span>
                         </div>
-                        <span className="text-sm text-slate-600 truncate font-medium">
-                          {p.user.email}
-                        </span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-sm text-slate-400 italic">

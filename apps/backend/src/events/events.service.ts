@@ -14,6 +14,17 @@ const organizerSelect = {
   creatorPage: { select: { slug: true } },
 } as const;
 
+const participantWithUserInclude = {
+  include: {
+    user: {
+      select: {
+        id: true,
+        email: true,
+      },
+    },
+  },
+} as const;
+
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
@@ -357,7 +368,7 @@ export class EventsService {
       const event = await tx.event.findUnique({
         where: { id },
         include: {
-          participants: true,
+          participants: participantWithUserInclude,
           organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
@@ -386,7 +397,7 @@ export class EventsService {
           where: { id },
           data: { colorTheme: null },
           include: {
-            participants: true,
+            participants: participantWithUserInclude,
             organizer: { select: organizerSelect },
             tags: { include: { tag: true } },
           },
@@ -413,7 +424,7 @@ export class EventsService {
         where: { id },
         data: { colorTheme: normalizedTheme },
         include: {
-          participants: true,
+          participants: participantWithUserInclude,
           organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
@@ -440,7 +451,7 @@ export class EventsService {
       const event = await tx.event.findUnique({
         where: { id },
         include: {
-          participants: true,
+          participants: participantWithUserInclude,
           organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
@@ -465,7 +476,7 @@ export class EventsService {
           where: { id },
           data: { iconPattern: null },
           include: {
-            participants: true,
+            participants: participantWithUserInclude,
             organizer: { select: organizerSelect },
             tags: { include: { tag: true } },
           },
@@ -487,7 +498,7 @@ export class EventsService {
         where: { id },
         data: { iconPattern: normalizedPattern },
         include: {
-          participants: true,
+          participants: participantWithUserInclude,
           organizer: { select: organizerSelect },
           tags: { include: { tag: true } },
         },
