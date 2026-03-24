@@ -34,7 +34,7 @@ export function CreatorPublicPage() {
       const res = await api.get(`/users/creator-pages/${slug}`);
       setPageData(res.data);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Не вдалося відкрити сторінку кріейтора');
+      toast.error(err?.response?.data?.message || 'Failed to open creator page');
       setPageData(null);
     } finally {
       setLoading(false);
@@ -46,11 +46,11 @@ export function CreatorPublicPage() {
   }, [slug]);
 
   if (loading) {
-    return <div className="py-8 text-slate-500">Завантаження...</div>;
+    return <div className="py-8 text-slate-500">Loading...</div>;
   }
 
   if (!pageData) {
-    return <div className="py-8 text-slate-500">Сторінка кріейтора не знайдена.</div>;
+    return <div className="py-8 text-slate-500">Creator page not found.</div>;
   }
 
   const organizerName = pageData.organizer.name?.trim() || pageData.organizer.email;
@@ -65,18 +65,18 @@ export function CreatorPublicPage() {
           <p className="mt-3 text-slate-600 leading-relaxed max-w-3xl">{pageData.description}</p>
         )}
         <p className="mt-4 text-sm font-semibold text-slate-500">
-          Організатор: <span className="text-slate-800">{organizerName}</span>
+          Organizer: <span className="text-slate-800">{organizerName}</span>
         </p>
       </div>
 
       <div className="mb-3 flex items-center justify-between gap-3 flex-wrap">
-        <h2 className="text-xl font-black text-slate-900">Івенти організатора</h2>
-        <span className="text-sm text-slate-500">Всього: {pageData.events.length}</span>
+        <h2 className="text-xl font-black text-slate-900">Organizer events</h2>
+        <span className="text-sm text-slate-500">Total: {pageData.events.length}</span>
       </div>
 
       {pageData.events.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-slate-500">
-          У цього організатора ще немає активних публічних івентів.
+          This organizer does not have active public events yet.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">

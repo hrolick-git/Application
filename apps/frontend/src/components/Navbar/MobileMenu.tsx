@@ -59,7 +59,7 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
 
             {/* Section for profile and settings */}
             <div className="mt-4 pt-4 border-t border-slate-100 space-y-1">
-                <Link to="/profile" onClick={onClose} className="flex items-center space-x-3 p-4 teкпxt-slate-600 hover:bg-slate-50 rounded-xl">
+              <Link to="/profile" onClick={onClose} className="flex items-center space-x-3 p-4 text-slate-600 hover:bg-slate-50 rounded-xl">
                 <UserCircleIcon className="w-6 h-6 text-slate-400" />
                 <span className="font-medium">Account Profile</span>
                 </Link>

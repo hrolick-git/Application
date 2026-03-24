@@ -76,7 +76,7 @@ export function Profile() {
   const redeemCoupon = async () => {
     const code = couponCode.trim();
     if (!code) {
-      toast.error("Введи код сертифікату або купона");
+      toast.error("Enter a certificate or coupon code");
       return;
     }
 
@@ -85,9 +85,9 @@ export function Profile() {
       const res = await api.post("/users/me/redeem-code", { code });
       setUser(res.data.user);
       setCouponCode("");
-      toast.success(`Успіх: +${res.data.added} vibecoins`);
+      toast.success(`Success: +${res.data.added} vibecoins`);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Не вдалося застосувати код");
+      toast.error(err?.response?.data?.message || "Failed to apply code");
     } finally {
       setIsRedeeming(false);
     }
@@ -158,7 +158,7 @@ export function Profile() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-2xl font-black text-slate-900">Vibecoins Wallet</h2>
-            <p className="text-slate-500">Поповнення через оплату ще в розробці, але купон уже працює.</p>
+            <p className="text-slate-500">Card top-up is still in development, but coupon redemption already works.</p>
           </div>
 
           <button
@@ -166,21 +166,21 @@ export function Profile() {
             disabled
             className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black uppercase tracking-wider text-slate-400 cursor-not-allowed"
           >
-            Поповнити (скоро)
+            Top up (soon)
           </button>
         </div>
 
         <div className="rounded-3xl border border-amber-100 bg-amber-50/50 p-5">
           <div className="flex items-center gap-2 mb-3">
             <GiftIcon className="h-5 w-5 text-amber-600" />
-            <p className="text-sm font-black uppercase tracking-widest text-amber-700">Сертифікат / Купон</p>
+            <p className="text-sm font-black uppercase tracking-widest text-amber-700">Certificate / Coupon</p>
           </div>
 
           <div className="flex flex-col md:flex-row gap-3">
             <input
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
-              placeholder="Введи код (наприклад, VIBE10)"
+              placeholder="Enter a code (e.g. VIBE10)"
               className="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 text-slate-700 outline-none focus:border-amber-400"
             />
             <button
@@ -189,7 +189,7 @@ export function Profile() {
               disabled={isRedeeming}
               className="rounded-2xl bg-amber-500 px-5 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-amber-600 disabled:opacity-50"
             >
-              {isRedeeming ? "Застосування..." : "Застосувати код"}
+              {isRedeeming ? "Applying..." : "Apply code"}
             </button>
           </div>
         </div>

@@ -264,7 +264,7 @@ body {
 /* ─── Calendar — Header Buttons ─────────────────────────────────────────── */
 
 .fc .fc-button-group {
-  gap: 4px; /* Додаємо невелику відстань між кнопками */
+  gap: 4px; /* Add small spacing between buttons */
 }
 
 .fc .fc-button {
@@ -273,7 +273,7 @@ body {
   color: #475569 !important; /* slate-600 */
   font-weight: 800 !important;
   text-transform: capitalize !important;
-  border-radius: 12px !important; /* Округлі кути як у тебе всюди */
+  border-radius: 12px !important; /* Rounded corners to match app style */
   padding: 8px 16px !important;
   transition: all 0.2s ease !important;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
@@ -286,7 +286,7 @@ body {
 }
 
 .fc .fc-button-active {
-  background-color: #4f46e5 !important; /* Твій indigo-600 */
+  background-color: #4f46e5 !important; /* App indigo-600 */
   border-color: #4f46e5 !important;
   color: #ffffff !important;
   box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2) !important;

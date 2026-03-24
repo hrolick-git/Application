@@ -56,7 +56,7 @@ export function JoinButton({
     "w-full py-4 rounded-[1.25rem] font-black text-sm transition-all duration-300 transform active:scale-95";
 
   const stateClasses = isArchived
-    ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none" // Архів завжди сірий
+    ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none" // Archived is always gray
     : isJoined
       ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 shadow-none"
       : isFull

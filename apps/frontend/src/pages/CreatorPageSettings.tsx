@@ -48,7 +48,7 @@ export function CreatorPageSettings() {
       }
     } catch (err: any) {
       if (err?.response?.status !== 404) {
-        toast.error(err?.response?.data?.message || 'Не вдалося завантажити сторінку кріейтора');
+        toast.error(err?.response?.data?.message || 'Failed to load creator page');
       }
       setCreatorPage(null);
     } finally {
@@ -80,9 +80,9 @@ export function CreatorPageSettings() {
       setDescription(res.data.creatorPage.description || '');
       setNewSlug(res.data.creatorPage.slug || '');
       applyVibecoins(res.data.vibecoins);
-      toast.success('Сторінку створено: -2 vibecoins');
+      toast.success('Creator page created: -2 vibecoins');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Не вдалося створити сторінку');
+      toast.error(err?.response?.data?.message || 'Failed to create page');
     } finally {
       setCreating(false);
     }
@@ -97,9 +97,9 @@ export function CreatorPageSettings() {
         description,
       });
       setCreatorPage(res.data);
-      toast.success('Title та description оновлено');
+      toast.success('Title and description updated');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Не вдалося оновити сторінку');
+      toast.error(err?.response?.data?.message || 'Failed to update page');
     } finally {
       setSavingProfile(false);
     }
@@ -114,19 +114,19 @@ export function CreatorPageSettings() {
       applyVibecoins(res.data.vibecoins);
 
       if (res.data.spent > 0) {
-        toast.success('Slug змінено: -2 vibecoins');
+        toast.success('Slug updated: -2 vibecoins');
       } else {
-        toast.success('Slug не змінено');
+        toast.success('Slug unchanged');
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Не вдалося змінити slug');
+      toast.error(err?.response?.data?.message || 'Failed to update slug');
     } finally {
       setRenamingSlug(false);
     }
   };
 
   if (loading) {
-    return <div className="py-8 text-slate-500">Завантаження...</div>;
+    return <div className="py-8 text-slate-500">Loading...</div>;
   }
 
   if (!creatorPage) {
@@ -135,15 +135,15 @@ export function CreatorPageSettings() {
         <div className="bg-white rounded-3xl border border-slate-100 p-5 md:p-8 shadow-sm">
           <h1 className="text-2xl md:text-3xl font-black text-slate-900">Creator Page</h1>
           <p className="mt-2 text-slate-600">
-            Створи персоналізовану сторінку організатора. Перше створення коштує 2 vibecoins.
+            Create your personalized organizer page. Initial creation costs 2 vibecoins.
           </p>
           <p className="mt-1 text-xs text-amber-700 font-semibold uppercase tracking-wider">
-            Поточний баланс: {user?.vibecoins ?? 0} vibecoins
+            Current balance: {user?.vibecoins ?? 0} vibecoins
           </p>
 
           <form onSubmit={createPage} className="mt-6 space-y-4">
             <div>
-              <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Slug (унікальний)</label>
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Slug (unique)</label>
               <input
                 value={createSlug}
                 onChange={(e) => setCreateSlug(e.target.value)}
@@ -169,7 +169,7 @@ export function CreatorPageSettings() {
               <textarea
                 value={createDescription}
                 onChange={(e) => setCreateDescription(e.target.value)}
-                placeholder="Опис сторінки..."
+                placeholder="Page description..."
                 rows={4}
                 className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-400"
               />
@@ -180,7 +180,7 @@ export function CreatorPageSettings() {
               disabled={creating}
               className="rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-indigo-700 disabled:opacity-50"
             >
-              {creating ? 'Створення...' : 'Створити за 2 vibecoins'}
+              {creating ? 'Creating...' : 'Create for 2 vibecoins'}
             </button>
           </form>
         </div>
@@ -194,13 +194,13 @@ export function CreatorPageSettings() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900">Creator Page</h1>
-            <p className="text-slate-500 mt-1">Безкоштовно редагуй title та description.</p>
+            <p className="text-slate-500 mt-1">Edit title and description for free.</p>
           </div>
           <Link
             to={`/creators/${creatorPage.slug}`}
             className="inline-flex items-center gap-2 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-2 font-bold text-indigo-700"
           >
-            Відкрити публічну сторінку
+            Open public page
             <ArrowTopRightOnSquareIcon className="w-4 h-4" />
           </Link>
         </div>
@@ -231,16 +231,16 @@ export function CreatorPageSettings() {
             disabled={savingProfile}
             className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-slate-800 disabled:opacity-50"
           >
-            {savingProfile ? 'Збереження...' : 'Зберегти безкоштовно'}
+            {savingProfile ? 'Saving...' : 'Save for free'}
           </button>
         </form>
       </div>
 
       <div className="bg-white rounded-3xl border border-amber-100 p-5 md:p-8 shadow-sm">
-        <h2 className="text-xl font-black text-slate-900">Slug (перейменування за 2 vibecoins)</h2>
-        <p className="text-slate-500 mt-1">Твій поточний slug: <span className="font-bold text-slate-800">{creatorPage.slug}</span></p>
+        <h2 className="text-xl font-black text-slate-900">Slug (rename for 2 vibecoins)</h2>
+        <p className="text-slate-500 mt-1">Your current slug: <span className="font-bold text-slate-800">{creatorPage.slug}</span></p>
         <p className="mt-1 text-xs text-amber-700 font-semibold uppercase tracking-wider">
-          Поточний баланс: {user?.vibecoins ?? 0} vibecoins
+          Current balance: {user?.vibecoins ?? 0} vibecoins
         </p>
 
         <form onSubmit={renameSlug} className="mt-4 flex flex-col sm:flex-row gap-3">
@@ -256,7 +256,7 @@ export function CreatorPageSettings() {
             disabled={renamingSlug}
             className="rounded-2xl bg-amber-500 px-5 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-amber-600 disabled:opacity-50"
           >
-            {renamingSlug ? 'Оновлення...' : 'Перейменувати за 2'}
+            {renamingSlug ? 'Updating...' : 'Rename for 2'}
           </button>
         </form>
       </div>

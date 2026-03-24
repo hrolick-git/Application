@@ -19,7 +19,7 @@ export function CreateEvent() {
         location: formData.location,
         visibility: formData.visibility || "PUBLIC",
         startsAt: new Date(formData.startsAt).toISOString(),
-        tagIds: formData.tagIds || [], // ← додай це
+        tagIds: formData.tagIds || [],
       };
 
       if (formData.endsAt) {
