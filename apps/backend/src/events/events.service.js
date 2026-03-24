@@ -16,6 +16,20 @@ const prisma_service_1 = require("../prisma.service");
 let EventsService = class EventsService {
     constructor(prisma) {
         this.prisma = prisma;
+        this.allowedColorThemes = new Set([
+            "violet",
+            "mint",
+            "sky",
+            "sunset",
+            "blossom",
+        ]);
+    }
+    normalizeColorTheme(theme) {
+        const normalizedTheme = (theme || "").toLowerCase().trim();
+        if (!this.allowedColorThemes.has(normalizedTheme)) {
+            throw new common_1.BadRequestException("Invalid color theme");
+        }
+        return normalizedTheme;
     }
     createShareToken() {
         return (0, crypto_1.randomBytes)(24).toString("hex");
@@ -134,11 +148,12 @@ let EventsService = class EventsService {
         if (new Date(data.startsAt) < new Date()) {
             throw new common_1.ForbiddenException("Cannot create an event in the past");
         }
-        const { tagIds, ...eventData } = data;
+        const { tagIds, colorTheme: _ignoredColorTheme, ...eventData } = data;
         return this.prisma.event.create({
             data: {
                 ...eventData,
                 organizerId: userId,
+                colorTheme: null,
                 shareToken: eventData.visibility === "PRIVATE" ? this.createShareToken() : null,
                 ...(tagIds === null || tagIds === void 0 ? void 0 : tagIds.length)
                     ? {
@@ -160,7 +175,7 @@ let EventsService = class EventsService {
             throw new common_1.NotFoundException("Event not found");
         if (event.organizerId !== userId)
             throw new common_1.ForbiddenException("Access denied");
-        const { tagIds, ...eventData } = data;
+        const { tagIds, colorTheme: _ignoredColorTheme, ...eventData } = data;
         const nextVisibility = eventData.visibility !== undefined ? eventData.visibility : event.visibility;
         const shareTokenData = nextVisibility === "PRIVATE"
             ? { shareToken: event.shareToken || this.createShareToken() }
@@ -249,6 +264,62 @@ let EventsService = class EventsService {
             select: { shareToken: true },
         });
         return { shareToken: updated.shareToken };
+    }
+    async changeTheme(id, userId, theme) {
+        const normalizedTheme = this.normalizeColorTheme(theme);
+        const result = await this.prisma.$transaction(async (tx) => {
+            const event = await tx.event.findUnique({
+                where: { id },
+                include: {
+                    participants: true,
+                    tags: { include: { tag: true } },
+                },
+            });
+            if (!event)
+                throw new common_1.NotFoundException("Event not found");
+            if (event.organizerId !== userId) {
+                throw new common_1.ForbiddenException("Only organizer can change event theme");
+            }
+            const user = await tx.user.findUnique({
+                where: { id: userId },
+                select: { vibecoins: true },
+            });
+            if (!user)
+                throw new common_1.NotFoundException("User not found");
+            if (event.colorTheme === normalizedTheme) {
+                return {
+                    event,
+                    vibecoins: user.vibecoins,
+                    spent: 0,
+                };
+            }
+            if (user.vibecoins < 1) {
+                throw new common_1.ForbiddenException("Not enough vibecoins");
+            }
+            const updatedUser = await tx.user.update({
+                where: { id: userId },
+                data: { vibecoins: { decrement: 1 } },
+                select: { vibecoins: true },
+            });
+            const updatedEvent = await tx.event.update({
+                where: { id },
+                data: { colorTheme: normalizedTheme },
+                include: {
+                    participants: true,
+                    tags: { include: { tag: true } },
+                },
+            });
+            return {
+                event: updatedEvent,
+                vibecoins: updatedUser.vibecoins,
+                spent: 1,
+            };
+        });
+        return {
+            event: this.serializeEvent(result.event, userId),
+            vibecoins: result.vibecoins,
+            spent: result.spent,
+        };
     }
     async leave(id, userId) {
         return this.prisma.participant.delete({

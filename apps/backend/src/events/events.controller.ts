@@ -121,6 +121,28 @@ export class EventsController {
     return this.events.getOrCreateShareToken(id, req.user.id);
   }
 
+  /** Spend 1 vibecoin to change event color theme (organizer only) */
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/theme')
+  async changeTheme(
+    @Param('id') id: string,
+    @Body('theme') theme: string | null,
+    @Req() req: any,
+  ) {
+    return this.events.changeTheme(id, req.user.id, theme);
+  }
+
+  /** Spend 1 vibecoin to set icon pattern background (organizer only) */
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/icon-pattern')
+  async changeIconPattern(
+    @Param('id') id: string,
+    @Body('pattern') pattern: string | null,
+    @Req() req: any,
+  ) {
+    return this.events.changeIconPattern(id, req.user.id, pattern);
+  }
+
   /** Leave */
   @UseGuards(JwtAuthGuard)
   @Post(':id/leave')

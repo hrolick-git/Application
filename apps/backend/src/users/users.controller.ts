@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
@@ -13,12 +13,23 @@ export class UsersController {
     if (!user) {
       return null;
     }
-    return { id: user.id, email: user.email };
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      vibecoins: user.vibecoins,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me/events')
   getMyEvents(@Req() req: any, @Query('archived') archived?: string) {
     return this.usersService.eventsForUser(req.user.id, archived === 'true');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('me/redeem-code')
+  redeemCode(@Req() req: any, @Body('code') code: string) {
+    return this.usersService.redeemVibecoinCode(req.user.id, code);
   }
 }

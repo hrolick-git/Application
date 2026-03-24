@@ -63,6 +63,9 @@ let EventsController = class EventsController {
     async getOrCreateShareLink(id, req) {
         return this.events.getOrCreateShareToken(id, req.user.id);
     }
+    async changeTheme(id, theme, req) {
+        return this.events.changeTheme(id, req.user.id, theme);
+    }
     async leave(id, req) {
         return this.events.leave(id, req.user.id);
     }
@@ -169,6 +172,16 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "getOrCreateShareLink", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)(':id/theme'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('theme')),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "changeTheme", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(':id/leave'),

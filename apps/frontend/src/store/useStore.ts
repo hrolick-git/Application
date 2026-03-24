@@ -6,6 +6,7 @@ interface User {
   id: string;
   email: string;
   name?: string;
+  vibecoins?: number;
 }
 
 interface Tag {
@@ -20,6 +21,7 @@ interface Event {
   organizerId: string;
   location: string;
   visibility: 'PUBLIC' | 'PRIVATE';
+  colorTheme?: string;
   capacity?: number | null;
   participants: any[];
   joined?: boolean;

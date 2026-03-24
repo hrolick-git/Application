@@ -44,7 +44,10 @@ describe('AuthController (e2e)', () => {
     return request(app.getHttpServer())
       .post('/auth/register')
       .send({ email: 'test@example.com', password: '123456', name: 'Test User' })
-      .expect(201);
+      .expect(201)
+      .expect((res) => {
+        if (res.body.vibecoins !== 5) throw new Error('Expected initial vibecoins = 5');
+      });
   });
 
   it('/auth/register (POST) — duplicate email returns 409', async () => {
@@ -100,6 +103,7 @@ describe('AuthController (e2e)', () => {
         if (!res.body.access_token) throw new Error('Missing access_token');
         if (!res.body.user) throw new Error('Missing user object');
         if (!res.body.user.email) throw new Error('Missing user email');
+        if (res.body.user.vibecoins !== 5) throw new Error('Expected vibecoins in login payload');
       });
   });
 

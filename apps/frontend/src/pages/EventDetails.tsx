@@ -13,8 +13,32 @@ import {
   PencilSquareIcon,
   LockClosedIcon,
   LinkIcon,
+  CpuChipIcon,
+  PaintBrushIcon,
+  BriefcaseIcon,
+  MusicalNoteIcon,
+  TrophyIcon,
+  CakeIcon,
+  PuzzlePieceIcon,
+  SparklesIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
+import {
+  EVENT_THEME_IDS,
+  EVENT_THEME_META,
+  getEventTheme,
+  type EventThemeId,
+} from "../constants/eventThemes";
+import {
+  ICON_PATTERN_IDS,
+  ICON_PATTERN_META,
+  getIconPattern,
+  type IconPatternId,
+} from "../constants/iconPatterns";
+
+type ThemeSelection = EventThemeId | "default";
 
 interface Tag {
   id: string;
@@ -31,11 +55,13 @@ interface Event {
   capacity?: number;
   visibility: "PUBLIC" | "PRIVATE";
   shareToken?: string;
+  colorTheme?: string;
   participants: { user: { email: string } }[] | undefined;
   organizerId: string;
   joined?: boolean;
   full?: boolean;
   tags?: Tag[];
+  iconPattern?: string;
 }
 
 const TAG_COLORS: Record<string, string> = {
@@ -45,13 +71,30 @@ const TAG_COLORS: Record<string, string> = {
   Music: "bg-purple-100 text-purple-700",
   Sport: "bg-green-100 text-green-700",
   Food: "bg-orange-100 text-orange-700",
+  Game: "bg-red-100 text-red-700",
   Other: "bg-slate-100 text-slate-600",
 };
+
+const PATTERN_ICON_MAP = {
+  tech: CpuChipIcon,
+  art: PaintBrushIcon,
+  business: BriefcaseIcon,
+  music: MusicalNoteIcon,
+  sport: TrophyIcon,
+  food: CakeIcon,
+  game: PuzzlePieceIcon,
+  other: SparklesIcon,
+} as const;
 
 export function EventDetails() {
   const { id, shareToken } = useParams();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previewTheme, setPreviewTheme] = useState<ThemeSelection | null>(null);
+  const [isApplyingTheme, setIsApplyingTheme] = useState(false);
+  const [previewPattern, setPreviewPattern] = useState<IconPatternId | "none" | null>(null);
+  const [isApplyingPattern, setIsApplyingPattern] = useState(false);
+  const [isThemeStudioOpen, setIsThemeStudioOpen] = useState(false);
   const navigate = useNavigate();
   const user = useStore((s) => s.user);
 
@@ -85,6 +128,11 @@ export function EventDetails() {
   useEffect(() => {
     fetch();
   }, [id, shareToken]);
+
+  useEffect(() => {
+    setPreviewTheme(null);
+    setPreviewPattern(null);
+  }, [event?.id, event?.colorTheme, event?.iconPattern]);
 
   const copyShareLink = async () => {
     if (typeof window === "undefined") return;
@@ -123,8 +171,85 @@ export function EventDetails() {
 
   const isOrganizer = event.organizerId === user?.id;
   const isPrivate = event.visibility === "PRIVATE";
+  const savedTheme = getEventTheme(event.colorTheme);
+  const savedSelection: ThemeSelection = savedTheme ?? "default";
+  const savedPattern = getIconPattern(event.iconPattern);
+  const savedPatternSelection: IconPatternId | "none" = savedPattern ?? "none";
+  const activePatternSelection: IconPatternId | "none" = previewPattern ?? savedPatternSelection;
+  const activeIconPattern: IconPatternId | null = activePatternSelection === "none" ? null : activePatternSelection;
+  const hasUnsavedPatternPreview = isOrganizer && previewPattern !== null && previewPattern !== savedPatternSelection;
+  const activeSelection: ThemeSelection = previewTheme ?? savedSelection;
+  const activeTheme = activeSelection === "default" ? null : activeSelection;
+  const hasActiveTheme = !!activeTheme;
+  const themeMeta = activeTheme ? EVENT_THEME_META[activeTheme] : null;
+  const patternIconTone = themeMeta ? themeMeta.infoIcon : "text-slate-400";
   const participantsList = event.participants || [];
   const tags = event.tags || [];
+  const hasUnsavedPreview =
+    isOrganizer && previewTheme !== null && previewTheme !== savedSelection;
+
+  const applyIconPattern = async () => {
+    if (!event || !isOrganizer) return;
+    if (previewPattern === null || previewPattern === savedPatternSelection) return;
+
+    const nextPattern = previewPattern === "none" ? null : previewPattern;
+
+    try {
+      setIsApplyingPattern(true);
+      const res = await api.post(`/events/${event.id}/icon-pattern`, { pattern: nextPattern });
+      setEvent(res.data.event);
+
+      if (user) {
+        useStore.getState().setUser({ ...user, vibecoins: res.data.vibecoins });
+      }
+
+      if (res.data.spent === 1) {
+        toast.success("Icon pattern set: -1 vibecoin");
+      } else if (nextPattern === null) {
+        toast.success("Icon pattern removed");
+      } else {
+        toast.success("Icon pattern already set");
+      }
+      setPreviewPattern(null);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to update icon pattern");
+    } finally {
+      setIsApplyingPattern(false);
+    }
+  };
+
+  const applyTheme = async () => {
+    if (!event || !isOrganizer) return;
+    if (previewTheme === null || previewTheme === savedSelection) return;
+
+    const nextTheme = previewTheme === "default" ? null : previewTheme;
+
+    try {
+      setIsApplyingTheme(true);
+      const res = await api.post(`/events/${event.id}/theme`, { theme: nextTheme });
+      setEvent(res.data.event);
+
+      if (user) {
+        useStore.getState().setUser({
+          ...user,
+          vibecoins: res.data.vibecoins,
+        });
+      }
+
+      if (res.data.spent === 1) {
+        toast.success("Theme updated: -1 vibecoin");
+      } else if (nextTheme === null) {
+        toast.success("Default free theme applied");
+      } else {
+        toast.success("Theme already selected");
+      }
+      setPreviewTheme(null);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to update theme");
+    } finally {
+      setIsApplyingTheme(false);
+    }
+  };
 
   return (
     <div className="bg-slate-50/30 py-4 md:p-10">
@@ -140,17 +265,71 @@ export function EventDetails() {
 
         <div
           className={`rounded-[2.5rem] shadow-xl overflow-hidden border ${
-            isPrivate
-              ? "bg-gradient-to-br from-white to-purple-50/50 border-purple-100"
+            hasActiveTheme && themeMeta
+              ? themeMeta.detailsSurface
               : "bg-white border-slate-100"
           }`}
         >
           {/* Header Section */}
-          <div className="p-6 md:p-12 border-b border-slate-50">
+          <div className="relative p-6 md:p-12 border-b border-slate-50 overflow-hidden">
+            {/* Icon pattern overlay */}
+            {activeIconPattern && ICON_PATTERN_META[activeIconPattern] && (
+              <div
+                className="absolute inset-0 pointer-events-none select-none overflow-hidden"
+                style={{
+                  maskImage: "linear-gradient(to right, transparent 18%, rgba(0,0,0,0.12) 64%, rgba(0,0,0,0.2) 100%)",
+                  WebkitMaskImage: "linear-gradient(to right, transparent 18%, rgba(0,0,0,0.12) 64%, rgba(0,0,0,0.2) 100%)",
+                }}
+              >
+                <div className="absolute right-0 -top-2 -bottom-8 w-[58%] grid grid-cols-9 gap-x-3 p-3">
+                  {Array.from({ length: 9 }).map((_, colIdx) => {
+                    const PatternIcon = PATTERN_ICON_MAP[activeIconPattern];
+                    const isShiftedColumn = colIdx % 2 === 1;
+                    const rightColNumber = 9 - colIdx;
+                    return (
+                      <div
+                        key={colIdx}
+                        className={`flex flex-col gap-y-3 ${isShiftedColumn ? "translate-y-2" : ""}`}
+                      >
+                        {Array.from({ length: 16 }).map((__, rowIdx) => {
+                          const rowNumber = rowIdx + 1;
+                          const isPriorityIcon =
+                            (rightColNumber === 1 && [2, 4, 6].includes(rowNumber)) ||
+                            (rightColNumber === 2 && [1, 3, 5].includes(rowNumber)) ||
+                            (rightColNumber === 3 && [2, 4].includes(rowNumber));
+                          const isBigSpecialIcon = rightColNumber === 2 && rowNumber === 3;
+                          const isFirstColumnSecondIcon = rightColNumber === 1 && rowNumber === 2;
+                          const isThirdColumnFourthIcon = rightColNumber === 3 && rowNumber === 4;
+                          const iconSize = isBigSpecialIcon
+                            ? "1.65rem"
+                            : isFirstColumnSecondIcon
+                              ? "1.1rem"
+                              : isThirdColumnFourthIcon
+                                ? "1rem"
+                                : "1.25rem";
+
+                          return (
+                            <PatternIcon
+                              key={`${colIdx}-${rowIdx}`}
+                              className={`${patternIconTone}`}
+                              style={{
+                                opacity: isPriorityIcon ? 1 : 0.35,
+                                width: iconSize,
+                                height: iconSize,
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex-1">
                 {isPrivate && (
-                  <div className="inline-flex items-center mb-4 px-3 py-1 rounded-full bg-purple-600 text-white shadow-lg shadow-purple-200">
+                  <div className={`inline-flex items-center mb-4 px-3 py-1 rounded-full text-white shadow-lg ${themeMeta ? themeMeta.badge : "bg-slate-700"}`}>
                     <LockClosedIcon className="w-3 h-3 mr-1.5" />
                     <span className="text-[10px] uppercase tracking-widest font-black">
                       Private Event
@@ -159,7 +338,7 @@ export function EventDetails() {
                 )}
                 <h1
                   className={`text-3xl md:text-5xl font-black leading-tight mb-3 ${
-                    isPrivate ? "text-purple-900" : "text-slate-900"
+                    hasActiveTheme && themeMeta ? themeMeta.title : "text-slate-900"
                   }`}
                 >
                   {event.title}
@@ -228,7 +407,7 @@ export function EventDetails() {
               <div className="space-y-2 md:space-y-4">
                 <div className="flex items-center p-3 md:p-4 bg-slate-50 rounded-2xl md:rounded-[1.5rem] border border-slate-100">
                   <div
-                    className={`p-2 md:p-3 rounded-xl mr-3 ${isPrivate ? "bg-purple-100 text-purple-600" : "bg-indigo-100 text-indigo-600"}`}
+                    className={`p-2 md:p-3 rounded-xl mr-3 ${hasActiveTheme && themeMeta ? themeMeta.icon : "bg-indigo-100 text-indigo-600"}`}
                   >
                     <CalendarDaysIcon className="w-6 h-6" />
                   </div>
@@ -279,6 +458,7 @@ export function EventDetails() {
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6">
                 Who's Coming
               </h3>
+
               <div className="bg-slate-50/50 rounded-[2rem] p-6 border border-slate-100">
                 {participantsList.length > 0 ? (
                   <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
@@ -301,8 +481,13 @@ export function EventDetails() {
               </div>
 
               <div className="mt-4 md:mt-8">
+                {hasUnsavedPreview && (
+                  <div className="mb-2 inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-indigo-700">
+                    Preview
+                  </div>
+                )}
                 <JoinButton
-                  event={event}
+                  event={{ ...event, colorTheme: activeTheme ?? undefined }}
                   onRefresh={fetch}
                   shareToken={shareToken}
                   className="py-5 text-lg"
@@ -310,6 +495,226 @@ export function EventDetails() {
               </div>
             </div>
           </div>
+
+          {isOrganizer && (
+            <div className="border-t border-slate-50 p-4 md:p-12">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <p className="text-sm font-black uppercase tracking-widest text-slate-500">
+                    Theme Studio
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsThemeStudioOpen((prev) => !prev)}
+                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-600 hover:bg-slate-50"
+                  >
+                    {isThemeStudioOpen ? "Hide" : "Show"}
+                    {isThemeStudioOpen ? (
+                      <ChevronUpIcon className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronDownIcon className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-sm font-bold text-slate-700">
+                  Balance: {(user?.vibecoins ?? 0)} vibecoins
+                </p>
+              </div>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  isThemeStudioOpen ? "mt-4 max-h-[1600px] opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-[1.5rem] border border-slate-100 bg-white p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">
+                      Color Theme Shop
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-medium">1 coin each</p>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewTheme("default")}
+                      className={`rounded-2xl border p-2 transition-all ${
+                        activeSelection === "default"
+                          ? "border-indigo-500 ring-2 ring-indigo-100 bg-indigo-50/40"
+                          : "border-slate-200 hover:border-indigo-300"
+                      }`}
+                    >
+                      <div className="h-7 rounded-xl border border-dashed border-slate-300 bg-slate-100" />
+                      <p className="mt-2 text-[11px] font-semibold text-slate-700 leading-tight">Default</p>
+                      <p className="text-[10px] text-slate-400">
+                        {savedSelection === "default" ? "Current" : "Free"}
+                      </p>
+                    </button>
+
+                    {EVENT_THEME_IDS.map((id) => {
+                      const meta = EVENT_THEME_META[id];
+                      const selected = activeSelection === id;
+                      const saved = savedTheme === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setPreviewTheme(id)}
+                          className={`rounded-2xl border p-2 transition-all ${
+                            selected
+                              ? "border-indigo-500 ring-2 ring-indigo-100 bg-indigo-50/40"
+                              : "border-slate-200 hover:border-indigo-300"
+                          }`}
+                        >
+                          <div className={`h-7 rounded-xl bg-gradient-to-r ${meta.preview}`} />
+                          <p className="mt-2 text-[11px] font-semibold text-slate-700 leading-tight">{meta.label}</p>
+                          <p className="text-[10px] text-slate-400">{saved ? "Current" : "1 coin"}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-3 flex items-center gap-2">
+                    {hasUnsavedPreview && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={applyTheme}
+                          disabled={
+                            isApplyingTheme ||
+                            (previewTheme !== "default" && (user?.vibecoins ?? 0) < 1)
+                          }
+                          className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-indigo-200 hover:bg-indigo-700 disabled:opacity-50"
+                        >
+                          {isApplyingTheme
+                            ? "Applying..."
+                            : previewTheme === "default"
+                              ? "Apply for free"
+                              : "Apply for 1 vibecoin"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewTheme(null)}
+                          disabled={isApplyingTheme}
+                          className="rounded-xl border border-indigo-100 bg-indigo-50/40 px-3 py-2 text-xs font-bold uppercase tracking-wider text-indigo-700 hover:bg-indigo-50"
+                        >
+                          Cancel Preview
+                        </button>
+                      </>
+                    )}
+
+                    {!hasUnsavedPreview && (
+                      <p className="text-xs text-slate-500">
+                        Pick a theme to preview. Coins are charged only when you apply.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.5rem] border border-slate-100 bg-white p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">
+                      Icon Pattern
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-medium">1 coin each</p>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewPattern("none")}
+                      className={`rounded-2xl border p-2 transition-all ${
+                        activePatternSelection === "none"
+                          ? "border-indigo-500 ring-2 ring-indigo-100 bg-indigo-50/40"
+                          : "border-slate-200 hover:border-indigo-300"
+                      }`}
+                    >
+                      <div className="h-7 rounded-xl border border-dashed border-slate-300 bg-slate-100" />
+                      <p className="mt-2 text-[11px] font-semibold text-slate-700 leading-tight">None</p>
+                      <p className="text-[10px] text-slate-400">
+                        {savedPatternSelection === "none" ? "Current" : "Free"}
+                      </p>
+                    </button>
+
+                    {ICON_PATTERN_IDS.map((pid) => {
+                      const meta = ICON_PATTERN_META[pid];
+                      const selected = activePatternSelection === pid;
+                      const saved = savedPattern === pid;
+                      const PatternIcon = PATTERN_ICON_MAP[pid];
+                      return (
+                        <button
+                          key={pid}
+                          type="button"
+                          onClick={() => setPreviewPattern(pid)}
+                          className={`rounded-2xl border p-2 transition-all ${
+                            selected
+                              ? "border-indigo-500 ring-2 ring-indigo-100 bg-indigo-50/40"
+                              : "border-slate-200 hover:border-indigo-300"
+                          }`}
+                        >
+                          <div
+                            className="h-8 rounded-xl bg-slate-50 overflow-hidden relative"
+                            style={{
+                              maskImage: "linear-gradient(to right, transparent 14%, rgba(0,0,0,0.25) 100%)",
+                              WebkitMaskImage: "linear-gradient(to right, transparent 14%, rgba(0,0,0,0.25) 100%)",
+                            }}
+                          >
+                            <span className={`absolute inset-0 grid grid-cols-5 content-start gap-x-2 gap-y-1.5 p-1 ${patternIconTone}`}>
+                              {Array.from({ length: 10 }).map((_, i) => (
+                                <PatternIcon
+                                  key={i}
+                                  className={`w-4 h-4 ${i % 2 === 1 ? "translate-y-0.5" : ""} opacity-80`}
+                                />
+                              ))}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-[11px] font-semibold text-slate-700 leading-tight">{meta.label}</p>
+                          <p className="text-[10px] text-slate-400">{saved ? "Current" : "1 coin"}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-3 flex items-center gap-2">
+                    {hasUnsavedPatternPreview && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={applyIconPattern}
+                          disabled={
+                            isApplyingPattern ||
+                            (previewPattern !== "none" && (user?.vibecoins ?? 0) < 1)
+                          }
+                          className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-indigo-200 hover:bg-indigo-700 disabled:opacity-50"
+                        >
+                          {isApplyingPattern
+                            ? "Applying..."
+                            : previewPattern === "none"
+                              ? "Remove for free"
+                              : "Apply for 1 vibecoin"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewPattern(null)}
+                          disabled={isApplyingPattern}
+                          className="rounded-xl border border-indigo-100 bg-indigo-50/40 px-3 py-2 text-xs font-bold uppercase tracking-wider text-indigo-700 hover:bg-indigo-50"
+                        >
+                          Cancel Preview
+                        </button>
+                      </>
+                    )}
+                    {!hasUnsavedPatternPreview && (
+                      <p className="text-xs text-slate-500">
+                        Pick an icon pattern to preview.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
