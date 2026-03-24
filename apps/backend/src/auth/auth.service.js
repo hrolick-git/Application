@@ -23,7 +23,7 @@ let AuthService = class AuthService {
         var _a, _b;
         const hash = await bcrypt.hash(password, 10);
         try {
-            return await this.prisma.user.create({ data: { email, passwordHash: hash, name } });
+            return await this.prisma.user.create({ data: { email, passwordHash: hash, name, vibecoins: 5 } });
         }
         catch (err) {
             if (err.code === 'P2002' && ((_b = (_a = err.meta) === null || _a === void 0 ? void 0 : _a.target) === null || _b === void 0 ? void 0 : _b.includes('email'))) {
@@ -45,7 +45,8 @@ let AuthService = class AuthService {
             user: {
                 id: user.id,
                 email: user.email,
-                name: user.name
+                name: user.name,
+                vibecoins: user.vibecoins,
             }
         };
     }

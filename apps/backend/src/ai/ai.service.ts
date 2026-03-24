@@ -4,10 +4,11 @@ import Groq from 'groq-sdk';
 
 @Injectable()
 export class AiService {
-  private groq: Groq;
+  private groq: Groq | null;
 
   constructor(private prisma: PrismaService) {
-    this.groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const apiKey = process.env.GROQ_API_KEY;
+    this.groq = apiKey ? new Groq({ apiKey }) : null;
   }
 
   async ask(question: string, userId: string): Promise<{ answer: string }> {
@@ -57,6 +58,10 @@ Rules:
 - Do not create, edit, or delete any data.
 - Format dates in a human-readable way.
 - If listing events, use bullet points.`;
+
+    if (!this.groq) {
+      return { answer: "Sorry, I didn't understand that. Please try rephrasing your question." };
+    }
 
     try {
       const completion = await this.groq.chat.completions.create({

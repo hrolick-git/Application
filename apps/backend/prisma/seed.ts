@@ -67,7 +67,7 @@ async function main() {
 
   const seededEvents: SeedEvent[] = [
     {
-      title: '💻 Future Devs Meetup: Build or Be Replaced',
+      title: 'Future Devs Meetup: Build or Be Replaced',
       description: 'A public meetup for developers who are tired of tutorials and ready to build real things. Live coding, brutal feedback, and zero patience for “I’ll do it later.”',
       dayOffset: 3,
       hour: 18,
@@ -91,7 +91,7 @@ async function main() {
       tags: ['Art', 'Business']
     },
     {
-      title: '🔒 Inner Circle: No Outsiders Allowed',
+      title: 'Inner Circle: No Outsiders Allowed',
       description: 'A strictly private event for those who are actually involved. Real decisions, real responsibility, and zero room for random opinions. If you’re invited — you’re expected to contribute.',
       dayOffset: 6,
       hour: 14,
@@ -103,7 +103,7 @@ async function main() {
       tags: ['Business']
     },
     {
-      title: '💼 Money Talks: Business Without Filters',
+      title: 'Money Talks: Business Without Filters',
       description: 'A public business event where we drop the fake success stories and talk about real wins, failures, and how to actually make money.',
       dayOffset: 7,
       hour: 14,
@@ -114,7 +114,7 @@ async function main() {
       tags: ['Tech']
     },
     {
-      title: '🎵 Sound Clash: Feel It or Leave',
+      title: 'Sound Clash: Feel It or Leave',
       description: 'A live music event where artists bring raw energy and the audience decides what’s worth listening to. No vibe — no mercy.',
       dayOffset: 8,
       hour: 20,

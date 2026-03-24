@@ -1,5 +1,6 @@
 import {
   Injectable,
+  BadRequestException,
   ForbiddenException,
   NotFoundException,
 } from "@nestjs/common";
@@ -9,6 +10,41 @@ import { PrismaService } from "../prisma.service";
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
+
+  private readonly allowedColorThemes = new Set([
+    "violet",
+    "mint",
+    "sky",
+    "sunset",
+    "blossom",
+  ]);
+
+  private readonly allowedIconPatterns = new Set([
+    "tech",
+    "art",
+    "business",
+    "music",
+    "sport",
+    "food",
+    "game",
+    "other",
+  ]);
+
+  private normalizeColorTheme(theme: string) {
+    const normalizedTheme = (theme || "").toLowerCase().trim();
+    if (!this.allowedColorThemes.has(normalizedTheme)) {
+      throw new BadRequestException("Invalid color theme");
+    }
+    return normalizedTheme;
+  }
+
+  private normalizeIconPattern(pattern: string) {
+    const normalized = (pattern || "").toLowerCase().trim();
+    if (!this.allowedIconPatterns.has(normalized)) {
+      throw new BadRequestException("Invalid icon pattern");
+    }
+    return normalized;
+  }
 
   private createShareToken() {
     return randomBytes(24).toString("hex");
@@ -157,12 +193,13 @@ export class EventsService {
       throw new ForbiddenException("Cannot create an event in the past");
     }
 
-    const { tagIds, ...eventData } = data;
+    const { tagIds, colorTheme: _ignoredColorTheme, ...eventData } = data;
 
     return this.prisma.event.create({
       data: {
         ...eventData,
         organizerId: userId,
+        colorTheme: null,
         shareToken:
           eventData.visibility === "PRIVATE" ? this.createShareToken() : null,
         ...(tagIds?.length
@@ -186,7 +223,7 @@ export class EventsService {
     if (event.organizerId !== userId)
       throw new ForbiddenException("Access denied");
 
-    const { tagIds, ...eventData } = data;
+    const { tagIds, colorTheme: _ignoredColorTheme, ...eventData } = data;
     const nextVisibility = eventData.visibility ?? event.visibility;
     const shareTokenData =
       nextVisibility === "PRIVATE"
@@ -286,6 +323,147 @@ export class EventsService {
     });
 
     return { shareToken: updated.shareToken };
+  }
+
+  async changeTheme(id: string, userId: string, theme?: string | null) {
+    const normalizedTheme = theme && theme.trim() ? this.normalizeColorTheme(theme) : null;
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      const event = await tx.event.findUnique({
+        where: { id },
+        include: {
+          participants: true,
+          tags: { include: { tag: true } },
+        },
+      });
+      if (!event) throw new NotFoundException("Event not found");
+      if (event.organizerId !== userId) {
+        throw new ForbiddenException("Only organizer can change event theme");
+      }
+
+      const user = await tx.user.findUnique({
+        where: { id: userId },
+        select: { vibecoins: true },
+      });
+      if (!user) throw new NotFoundException("User not found");
+
+      if (event.colorTheme === normalizedTheme) {
+        return {
+          event,
+          vibecoins: user.vibecoins,
+          spent: 0,
+        };
+      }
+
+      if (normalizedTheme === null) {
+        const updatedEvent = await tx.event.update({
+          where: { id },
+          data: { colorTheme: null },
+          include: {
+            participants: true,
+            tags: { include: { tag: true } },
+          },
+        });
+
+        return {
+          event: updatedEvent,
+          vibecoins: user.vibecoins,
+          spent: 0,
+        };
+      }
+
+      if (user.vibecoins < 1) {
+        throw new ForbiddenException("Not enough vibecoins");
+      }
+
+      const updatedUser = await tx.user.update({
+        where: { id: userId },
+        data: { vibecoins: { decrement: 1 } },
+        select: { vibecoins: true },
+      });
+
+      const updatedEvent = await tx.event.update({
+        where: { id },
+        data: { colorTheme: normalizedTheme },
+        include: {
+          participants: true,
+          tags: { include: { tag: true } },
+        },
+      });
+
+      return {
+        event: updatedEvent,
+        vibecoins: updatedUser.vibecoins,
+        spent: 1,
+      };
+    });
+
+    return {
+      event: this.serializeEvent(result.event, userId),
+      vibecoins: result.vibecoins,
+      spent: result.spent,
+    };
+  }
+
+  async changeIconPattern(id: string, userId: string, pattern?: string | null) {
+    const normalizedPattern = pattern && pattern.trim() ? this.normalizeIconPattern(pattern) : null;
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      const event = await tx.event.findUnique({
+        where: { id },
+        include: {
+          participants: true,
+          tags: { include: { tag: true } },
+        },
+      });
+      if (!event) throw new NotFoundException("Event not found");
+      if (event.organizerId !== userId) {
+        throw new ForbiddenException("Only organizer can change icon pattern");
+      }
+
+      const user = await tx.user.findUnique({
+        where: { id: userId },
+        select: { vibecoins: true },
+      });
+      if (!user) throw new NotFoundException("User not found");
+
+      if (event.iconPattern === normalizedPattern) {
+        return { event, vibecoins: user.vibecoins, spent: 0 };
+      }
+
+      if (normalizedPattern === null) {
+        const updatedEvent = await tx.event.update({
+          where: { id },
+          data: { iconPattern: null },
+          include: { participants: true, tags: { include: { tag: true } } },
+        });
+        return { event: updatedEvent, vibecoins: user.vibecoins, spent: 0 };
+      }
+
+      if (user.vibecoins < 1) {
+        throw new ForbiddenException("Not enough vibecoins");
+      }
+
+      const updatedUser = await tx.user.update({
+        where: { id: userId },
+        data: { vibecoins: { decrement: 1 } },
+        select: { vibecoins: true },
+      });
+
+      const updatedEvent = await tx.event.update({
+        where: { id },
+        data: { iconPattern: normalizedPattern },
+        include: { participants: true, tags: { include: { tag: true } } },
+      });
+
+      return { event: updatedEvent, vibecoins: updatedUser.vibecoins, spent: 1 };
+    });
+
+    return {
+      event: this.serializeEvent(result.event, userId),
+      vibecoins: result.vibecoins,
+      spent: result.spent,
+    };
   }
 
   async leave(id: string, userId: string) {

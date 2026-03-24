@@ -25,7 +25,12 @@ let UsersController = class UsersController {
         if (!user) {
             return null;
         }
-        return { id: user.id, email: user.email };
+        return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            vibecoins: user.vibecoins,
+        };
     }
     getMyEvents(req) {
         return this.usersService.eventsForUser(req.user.id);

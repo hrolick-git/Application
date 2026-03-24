@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bars3Icon } from '@heroicons/react/24/outline';
+import { Bars3Icon, CircleStackIcon } from '@heroicons/react/24/outline';
 import { Logo } from './Logo';
 import { NavLinks } from './NavLinks';
 import { UserMenu } from './UserMenu';
@@ -28,6 +28,15 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center">
+          {user && (
+            <div className="mr-3 inline-flex items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-amber-700">
+              <CircleStackIcon className="h-4 w-4" />
+              <span className="text-xs font-black uppercase tracking-wide">
+                {user.vibecoins ?? 0} VC
+              </span>
+            </div>
+          )}
+
           {/* Desktop Menu (only for wide screens) */}
           <div className="hidden md:block">
             <UserMenu user={user} onLogout={handleLogout} />

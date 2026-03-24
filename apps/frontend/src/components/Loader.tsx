@@ -2,7 +2,7 @@ import { TicketIcon } from '@heroicons/react/24/outline';
 
 export function Loader() {
   return (
-    <div className="flex flex-col justify-center items-center h-[60vh] space-y-2 md:space-y-4">
+    <div className="flex flex-col justify-center items-center min-h-screen space-y-2 md:space-y-4 ">
       <div className="relative flex items-center justify-center">
         {/* Pulsing background circle */}
         <div className="absolute w-16 h-16 bg-indigo-100 rounded-2xl animate-ping opacity-75"></div>

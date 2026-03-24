@@ -89,6 +89,7 @@ describe('Events (e2e)', () => {
 
     eventId = res.body.id;
     if (!eventId) throw new Error('Missing event id');
+    if (res.body.colorTheme !== null) throw new Error('Public event should start without theme');
   });
 
   it('/events (POST) — creates private event with share token', async () => {
@@ -109,6 +110,7 @@ describe('Events (e2e)', () => {
 
     if (!privateEventId) throw new Error('Missing private event id');
     if (!privateShareToken) throw new Error('Missing private share token');
+    if (res.body.colorTheme !== null) throw new Error('Private event should start without theme');
   });
 
   it('/events (POST) — returns 401 without token', () => {
@@ -234,6 +236,80 @@ describe('Events (e2e)', () => {
       .expect((res) => {
         if (res.body.id !== privateEventId) throw new Error('Wrong private event id after join');
       });
+  });
+
+  it('/events/:id/theme (POST) — organizer can change public theme and spend 1 vibecoin', async () => {
+    const res = await request(app.getHttpServer())
+      .post(`/events/${eventId}/theme`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ theme: 'sky' })
+      .expect(201);
+
+    if (res.body.event?.colorTheme !== 'sky') {
+      throw new Error('Expected public event colorTheme to be sky');
+    }
+    if (res.body.spent !== 1) {
+      throw new Error('Expected spent=1 for public event theme change');
+    }
+  });
+
+  it('/events/:id/theme (POST) — organizer can change private theme and spend 1 vibecoin', async () => {
+    const res = await request(app.getHttpServer())
+      .post(`/events/${privateEventId}/theme`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ theme: 'mint' })
+      .expect(201);
+
+    if (res.body.event?.colorTheme !== 'mint') {
+      throw new Error('Expected event colorTheme to be mint');
+    }
+    if (res.body.spent !== 1) {
+      throw new Error('Expected spent=1 for theme change');
+    }
+    if (typeof res.body.vibecoins !== 'number') {
+      throw new Error('Expected vibecoins in response');
+    }
+  });
+
+  it('/events/:id/theme (POST) — selecting same theme does not spend coin', async () => {
+    const before = await prisma.user.findUnique({
+      where: { email: 'eve@example.com' },
+      select: { vibecoins: true },
+    });
+
+    const res = await request(app.getHttpServer())
+      .post(`/events/${privateEventId}/theme`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ theme: 'mint' })
+      .expect(201);
+
+    const after = await prisma.user.findUnique({
+      where: { email: 'eve@example.com' },
+      select: { vibecoins: true },
+    });
+
+    if (res.body.spent !== 0) {
+      throw new Error('Expected spent=0 when selecting same theme');
+    }
+    if (!before || !after || before.vibecoins !== after.vibecoins) {
+      throw new Error('Vibecoins should not change when selecting same theme');
+    }
+  });
+
+  it('/events/:id/theme (POST) — rejects invalid theme', () => {
+    return request(app.getHttpServer())
+      .post(`/events/${privateEventId}/theme`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ theme: 'neon' })
+      .expect(400);
+  });
+
+  it('/events/:id/theme (POST) — non-organizer gets 403', () => {
+    return request(app.getHttpServer())
+      .post(`/events/${privateEventId}/theme`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .send({ theme: 'sky' })
+      .expect(403);
   });
 
   it('/events/:id/leave (POST) — user can leave private event after shared join', () => {

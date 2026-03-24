@@ -13,10 +13,23 @@ model User {
   email        String      @unique
   name         String?
   passwordHash String
+  vibecoins    Int         @default(5)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   organized    Event[]     @relation("organizer")
   participants Participant[]
+  redemptions  VibecoinRedemption[]
+}
+
+model VibecoinRedemption {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  code      String
+  amount    Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, code])
 }
 
 model Event {
@@ -29,6 +42,8 @@ model Event {
   capacity    Int?
   visibility  Visibility    @default(PUBLIC)
   shareToken  String?       @unique
+  colorTheme  String?
+  iconPattern String?
   organizer   User          @relation("organizer", fields: [organizerId], references: [id])
   organizerId String
   participants Participant[]
