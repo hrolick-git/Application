@@ -45,6 +45,12 @@ interface Tag {
   name: string;
 }
 
+interface Creator {
+  id: string;
+  email: string;
+  name?: string | null;
+}
+
 interface Event {
   id: string;
   title: string;
@@ -62,6 +68,8 @@ interface Event {
   full?: boolean;
   tags?: Tag[];
   iconPattern?: string;
+  creator?: Creator | null;
+  organizer?: Creator | null;
 }
 
 const TAG_COLORS: Record<string, string> = {
@@ -185,6 +193,12 @@ export function EventDetails() {
   const patternIconTone = themeMeta ? themeMeta.infoIcon : "text-slate-400";
   const participantsList = event.participants || [];
   const tags = event.tags || [];
+  const creatorLabel =
+    event.creator?.name?.trim() ||
+    event.creator?.email ||
+    event.organizer?.name?.trim() ||
+    event.organizer?.email ||
+    "Unknown";
   const hasUnsavedPreview =
     isOrganizer && previewTheme !== null && previewTheme !== savedSelection;
 
@@ -343,6 +357,10 @@ export function EventDetails() {
                 >
                   {event.title}
                 </h1>
+
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Created by: <span className="normal-case tracking-normal text-slate-600">{creatorLabel}</span>
+                </p>
 
                 {/* Tags */}
                 {tags.length > 0 && (

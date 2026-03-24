@@ -66,7 +66,7 @@ export class EventsService {
 
   private serializeEvent(event: any, userId?: string, now = new Date()) {
     const plainEvent = JSON.parse(JSON.stringify(event));
-    const { shareToken, ...eventData } = plainEvent;
+    const { shareToken, organizer, ...eventData } = plainEvent;
     const includeShareToken =
       !!userId &&
       eventData.visibility === "PRIVATE" &&
@@ -80,6 +80,13 @@ export class EventsService {
         : false,
       isArchived: this.isArchived(eventData, now),
       tags: eventData.tags.map((eventTag: any) => eventTag.tag),
+      creator: organizer
+        ? {
+            id: organizer.id,
+            email: organizer.email,
+            name: organizer.name,
+          }
+        : null,
       ...(includeShareToken ? { shareToken } : {}),
     };
   }
@@ -99,6 +106,7 @@ export class EventsService {
       data: { shareToken: this.createShareToken() },
       include: {
         participants: { include: { user: true } },
+        organizer: { select: { id: true, email: true, name: true } },
         tags: { include: { tag: true } },
       },
     });
@@ -143,6 +151,7 @@ export class EventsService {
       orderBy: { startsAt: "asc" },
       include: {
         participants: true,
+        organizer: { select: { id: true, email: true, name: true } },
         tags: { include: { tag: true } },
       },
     });
@@ -155,6 +164,7 @@ export class EventsService {
       where: { id },
       include: {
         participants: { include: { user: true } },
+        organizer: { select: { id: true, email: true, name: true } },
         tags: { include: { tag: true } },
       },
     });
@@ -177,6 +187,7 @@ export class EventsService {
       where: { shareToken },
       include: {
         participants: { include: { user: true } },
+        organizer: { select: { id: true, email: true, name: true } },
         tags: { include: { tag: true } },
       },
     });
@@ -195,7 +206,7 @@ export class EventsService {
 
     const { tagIds, colorTheme: _ignoredColorTheme, ...eventData } = data;
 
-    return this.prisma.event.create({
+    const event = await this.prisma.event.create({
       data: {
         ...eventData,
         organizerId: userId,
@@ -212,9 +223,12 @@ export class EventsService {
       },
       include: {
         participants: true,
+        organizer: { select: { id: true, email: true, name: true } },
         tags: { include: { tag: true } },
       },
     });
+
+    return this.serializeEvent(event, userId);
   }
 
   async update(id: string, data: any, userId: string) {
@@ -240,7 +254,7 @@ export class EventsService {
       }
     }
 
-    return this.prisma.event.update({
+    const updated = await this.prisma.event.update({
       where: { id },
       data: {
         ...eventData,
@@ -248,9 +262,12 @@ export class EventsService {
       },
       include: {
         participants: true,
+        organizer: { select: { id: true, email: true, name: true } },
         tags: { include: { tag: true } },
       },
     });
+
+    return this.serializeEvent(updated, userId);
   }
 
   async delete(id: string, userId: string) {
@@ -333,6 +350,7 @@ export class EventsService {
         where: { id },
         include: {
           participants: true,
+          organizer: { select: { id: true, email: true, name: true } },
           tags: { include: { tag: true } },
         },
       });
@@ -361,6 +379,7 @@ export class EventsService {
           data: { colorTheme: null },
           include: {
             participants: true,
+            organizer: { select: { id: true, email: true, name: true } },
             tags: { include: { tag: true } },
           },
         });
@@ -387,6 +406,7 @@ export class EventsService {
         data: { colorTheme: normalizedTheme },
         include: {
           participants: true,
+          organizer: { select: { id: true, email: true, name: true } },
           tags: { include: { tag: true } },
         },
       });
@@ -413,6 +433,7 @@ export class EventsService {
         where: { id },
         include: {
           participants: true,
+          organizer: { select: { id: true, email: true, name: true } },
           tags: { include: { tag: true } },
         },
       });
@@ -435,7 +456,11 @@ export class EventsService {
         const updatedEvent = await tx.event.update({
           where: { id },
           data: { iconPattern: null },
-          include: { participants: true, tags: { include: { tag: true } } },
+          include: {
+            participants: true,
+            organizer: { select: { id: true, email: true, name: true } },
+            tags: { include: { tag: true } },
+          },
         });
         return { event: updatedEvent, vibecoins: user.vibecoins, spent: 0 };
       }
@@ -453,7 +478,11 @@ export class EventsService {
       const updatedEvent = await tx.event.update({
         where: { id },
         data: { iconPattern: normalizedPattern },
-        include: { participants: true, tags: { include: { tag: true } } },
+        include: {
+          participants: true,
+          organizer: { select: { id: true, email: true, name: true } },
+          tags: { include: { tag: true } },
+        },
       });
 
       return { event: updatedEvent, vibecoins: updatedUser.vibecoins, spent: 1 };
@@ -488,6 +517,7 @@ export class EventsService {
       orderBy: { startsAt: "asc" },
       include: {
         participants: true,
+        organizer: { select: { id: true, email: true, name: true } },
         tags: { include: { tag: true } },
       },
     });
@@ -499,6 +529,7 @@ export class EventsService {
     const event = await this.prisma.event.findUnique({
       where: { id },
       include: {
+        organizer: { select: { email: true, id: true, name: true } },
         participants: {
           include: {
             user: { select: { email: true, id: true } },

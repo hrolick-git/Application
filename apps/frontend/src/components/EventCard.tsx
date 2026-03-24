@@ -26,6 +26,12 @@ interface Tag {
   name: string;
 }
 
+interface Creator {
+  id: string;
+  email: string;
+  name?: string | null;
+}
+
 interface EventCardProps {
   event: any;
   isOrganizer: boolean;
@@ -63,6 +69,8 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
   const iconPattern = getIconPattern(e.iconPattern);
   const patternIconTone = themeMeta ? themeMeta.infoIcon : 'text-slate-400';
   const tags: Tag[] = e.tags || [];
+  const creator: Creator | null = e.creator || e.organizer || null;
+  const creatorLabel = creator?.name?.trim() || creator?.email || 'Unknown';
 
   const copyShareLink = async () => {
     if (typeof window === 'undefined') return;
@@ -181,6 +189,10 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
             <span className="text-[10px] uppercase tracking-widest font-black">Private Access</span>
           </div>
         )}
+
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          Created by: <span className="normal-case tracking-normal text-slate-600">{creatorLabel}</span>
+        </p>
 
         {/* Tags */}
         {tags.length > 0 && (
