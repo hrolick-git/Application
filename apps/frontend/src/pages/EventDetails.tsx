@@ -351,7 +351,7 @@ export function EventDetails() {
                   </div>
                 )}
                 <h1
-                  className={`text-3xl md:text-5xl font-black leading-tight mb-3 ${
+                  className={`text-xl md:text-4xl font-black leading-tight mb-3 ${
                     hasActiveTheme && themeMeta ? themeMeta.title : "text-slate-900"
                   }`}
                 >
@@ -376,7 +376,7 @@ export function EventDetails() {
                   </div>
                 )}
 
-                <p className="text-lg text-slate-500 leading-relaxed italic">
+                <p className="text-sm md:text-base text-slate-500 leading-relaxed italic">
                   "{event.description || "No description provided."}"
                 </p>
               </div>
@@ -477,7 +477,7 @@ export function EventDetails() {
                 Who's Coming
               </h3>
 
-              <div className="bg-slate-50/50 rounded-[2rem] p-6 border border-slate-100">
+              <div className="bg-slate-50/50 rounded-[2rem] p-4 md:p-6 border border-slate-100">
                 {participantsList.length > 0 ? (
                   <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                     {participantsList.map((p, idx) => (
@@ -516,7 +516,7 @@ export function EventDetails() {
 
           {isOrganizer && (
             <div className="border-t border-slate-50 p-4 md:p-12">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <p className="text-sm font-black uppercase tracking-widest text-slate-500">
                     Theme Studio
@@ -534,7 +534,7 @@ export function EventDetails() {
                     )}
                   </button>
                 </div>
-                <p className="text-sm font-bold text-slate-700">
+                <p className="text-sm font-bold text-slate-700 text-center sm:text-left">
                   Balance: {(user?.vibecoins ?? 0)} vibecoins
                 </p>
               </div>
@@ -593,7 +593,7 @@ export function EventDetails() {
                     })}
                   </div>
 
-                  <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
                     {hasUnsavedPreview && (
                       <>
                         <button
@@ -694,7 +694,7 @@ export function EventDetails() {
                     })}
                   </div>
 
-                  <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
                     {hasUnsavedPatternPreview && (
                       <>
                         <button

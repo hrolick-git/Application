@@ -99,13 +99,13 @@ export function Profile() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="p-6 md:p-10 max-w-5xl mx-auto"
+      className="py-6 md:p-10 max-w-5xl mx-auto"
     >
       
       {/* Profile Header */}
       <motion.div 
         variants={item}
-        className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8 flex flex-col md:flex-row items-center gap-8"
+        className="bg-white rounded-[2.5rem] p-5 md:p-8 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8 flex flex-col md:flex-row items-center gap-5 md:gap-8"
       >
         <div className="relative">
           {/* Avatar with gradient */}
@@ -134,7 +134,7 @@ export function Profile() {
             key={stat.label} 
             variants={item}
             whileHover={{ y: -5, transition: { duration: 0.2 } }}
-            className="bg-white p-6 rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/40 flex items-center gap-6"
+            className="bg-white p-4 md:p-6 rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/40 flex items-center gap-4 md:gap-6"
           >
             <div className={`p-4 ${stat.bg} rounded-2xl`}>
               <stat.icon className={`w-8 h-8 ${stat.color}`} />
@@ -143,7 +143,7 @@ export function Profile() {
               <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">
                 {stat.label}
               </p>
-              <p className="text-4xl font-black text-slate-900 leading-none mt-1">
+              <p className="text-3xl md:text-4xl font-black text-slate-900 leading-none mt-1">
                 {stat.value}
               </p>
             </div>
@@ -153,7 +153,7 @@ export function Profile() {
 
       <motion.div
         variants={item}
-        className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8"
+        className="bg-white rounded-[2.5rem] p-5 md:p-8 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8"
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>

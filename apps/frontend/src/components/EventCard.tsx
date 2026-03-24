@@ -91,7 +91,7 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
   };
 
   return (
-    <div className={`group relative overflow-hidden rounded-[2.5rem] p-7 shadow-sm hover:shadow-2xl transition-all duration-500 border flex flex-col h-full min-h-[340px] ${
+    <div className={`group relative overflow-hidden rounded-[2.5rem] p-4 md:p-7 shadow-sm hover:shadow-2xl transition-all duration-500 border flex flex-col h-full min-h-[340px] ${
       hasTheme && themeMeta
         ? themeMeta.cardSurface
         : 'bg-white border-slate-100 hover:shadow-indigo-200/40'

@@ -112,10 +112,10 @@ export function MyEvents() {
                 {events.length === 1 ? "Event" : "Events"}
               </span>
             </div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none">
+            <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-none">
               My Events
             </h1>
-            <p className="text-slate-500 mt-3 text-lg font-medium flex items-center">
+            <p className="text-slate-500 mt-3 text-base md:text-lg font-medium flex flex-wrap items-center gap-1">
               Manage your personal time and upcoming activities{" "}
               <SparklesIcon className="w-5 h-5 ml-2 text-amber-400" />
             </p>

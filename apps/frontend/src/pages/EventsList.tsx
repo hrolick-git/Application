@@ -157,7 +157,7 @@ export function EventsList() {
   if (loading) return <Loader />;
 
   return (
-    <div className="p-6 min-h-screen">
+    <div className="py-4 md:p-6 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.header
@@ -166,10 +166,10 @@ export function EventsList() {
           className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6"
         >
           <div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
               Explore Events
             </h1>
-            <p className="text-slate-500 mt-2 text-lg">
+            <p className="text-slate-500 mt-2 text-base md:text-lg">
               Find exciting activities happening around you
             </p>
           </div>
@@ -242,7 +242,7 @@ export function EventsList() {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 items-start"
+              className="grid gap-5 md:gap-8 md:grid-cols-2 lg:grid-cols-3 items-start"
             >
               {visibleEvents.map((e) => (
                 <motion.div key={e.id} variants={cardVariants}>
