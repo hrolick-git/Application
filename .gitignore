@@ -18,6 +18,7 @@ dist/
 # Build artifacts
 apps/backend/dist/
 apps/frontend/dist/
+*.tsbuildinfo
 
 *storybook.log
 storybook-static
