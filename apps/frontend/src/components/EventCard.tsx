@@ -106,17 +106,17 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
             WebkitMaskImage: 'linear-gradient(to right, transparent 22%, rgba(0,0,0,0.12) 70%, rgba(0,0,0,0.2) 100%)',
           }}
         >
-          <div className="absolute right-0 -top-2 -bottom-8 w-[58%] grid grid-cols-9 gap-x-3 p-3">
-            {Array.from({ length: 9 }).map((_, colIdx) => {
+          <div className="absolute right-0 -top-2 -bottom-8 w-[58%] grid grid-cols-7 gap-x-6 p-5">
+            {Array.from({ length: 7 }).map((_, colIdx) => {
               const PatternIcon = PATTERN_ICON_MAP[iconPattern];
               const isShiftedColumn = colIdx % 2 === 1;
-              const rightColNumber = 9 - colIdx;
+              const rightColNumber = 7 - colIdx;
               return (
                 <div
                   key={colIdx}
-                  className={`flex flex-col gap-y-3 ${isShiftedColumn ? 'translate-y-2' : ''}`}
+                  className={`flex flex-col gap-y-5 ${isShiftedColumn ? 'translate-y-3' : ''}`}
                 >
-                  {Array.from({ length: 16 }).map((__, rowIdx) => {
+                  {Array.from({ length: 11 }).map((__, rowIdx) => {
                     const rowNumber = rowIdx + 1;
                     const isPriorityIcon =
                       (rightColNumber === 1 && [2, 4, 6].includes(rowNumber)) ||
