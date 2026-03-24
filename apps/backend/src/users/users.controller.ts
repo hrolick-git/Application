@@ -27,6 +27,12 @@ export class UsersController {
     return this.usersService.eventsForUser(req.user.id, archived === 'true');
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/display-name')
+  updateDisplayName(@Req() req: any, @Body('name') name: string) {
+    return this.usersService.updateDisplayName(req.user.id, name);
+  }
+
   @Get('creator-pages/:slug')
   getCreatorPageBySlug(@Param('slug') slug: string, @Query('archived') archived?: string) {
     return this.usersService.getCreatorPageBySlug(slug, archived === 'true');

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../store/useStore';
+import api from '../api/api';
 import { 
   UserIcon, 
   BellIcon, 
@@ -11,12 +12,21 @@ import { toast } from 'react-hot-toast';
 export function Settings() {
   const { user, setUser } = useStore();
   const [name, setName] = useState(user?.name || '');
+  const [isSaving, setIsSaving] = useState(false);
 
-  // For now, this is just a visual demo. The handleSave function simulates saving the settings.
-  const handleSave = () => {
-    if (user) {
-      setUser({ ...user, name });
-      toast.success('Settings saved successfully! 🚀');
+  const handleSave = async () => {
+    if (!user) return;
+
+    try {
+      setIsSaving(true);
+      const res = await api.patch('/users/me/display-name', { name });
+      setUser(res.data);
+      setName(res.data.name || '');
+      toast.success('Display name updated successfully');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to update display name');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -125,9 +135,10 @@ export function Settings() {
           </button>
           <button 
             onClick={handleSave}
-            className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95"
+            disabled={isSaving}
+            className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Changes
+            {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>

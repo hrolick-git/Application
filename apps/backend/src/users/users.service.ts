@@ -18,8 +18,33 @@ export class UsersService {
   private readonly creatorPageSlugRenameCost = 2;
   private readonly creatorPageSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+  private normalizeDisplayName(rawName: string) {
+    const name = (rawName || '').trim();
+    if (name.length < 2 || name.length > 60) {
+      throw new BadRequestException('Display name must be 2-60 characters long');
+    }
+    return name;
+  }
+
   async findById(id: string) {
     return this.prisma.user.findUnique({ where: { id } });
+  }
+
+  async updateDisplayName(userId: string, rawName: string) {
+    const name = this.normalizeDisplayName(rawName);
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { name },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        vibecoins: true,
+      },
+    });
+
+    return user;
   }
 
   private buildArchiveWhere(archived: boolean, now = new Date()) {
