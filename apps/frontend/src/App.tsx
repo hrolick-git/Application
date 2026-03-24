@@ -18,6 +18,8 @@ import { Register } from "./pages/Register";
 import { Settings } from "./pages/Settings";
 import { Profile } from "./pages/Profile";
 import { Loader } from "./components/Loader";
+import { CreatorPageSettings } from "./pages/CreatorPageSettings";
+import { CreatorPublicPage } from "./pages/CreatorPublicPage";
 
 export function App() {
   const setUser = useStore((s) => s.setUser);
@@ -95,6 +97,15 @@ export function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/creators/:slug" element={<CreatorPublicPage />} />
+            <Route
+              path="/creator-page"
+              element={
+                <ProtectedRoute>
+                  <CreatorPageSettings />
                 </ProtectedRoute>
               }
             />

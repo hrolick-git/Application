@@ -7,8 +7,7 @@ import {
   ArrowRightOnRectangleIcon,
   TicketIcon,
   XMarkIcon,
-  UserPlusIcon,
-  ArrowRightStartOnRectangleIcon
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 
 interface MobileMenuProps {
@@ -51,6 +50,11 @@ export const MobileMenu = ({ user, onLogout, onClose }: MobileMenuProps) => {
             <Link to="/events/new" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl font-bold text-slate-700">
                 <PlusCircleIcon className="w-6 h-6 text-indigo-600" />
                 <span>Create Event</span>
+            </Link>
+
+            <Link to="/creator-page" onClick={onClose} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-2xl font-bold text-slate-700">
+                <SparklesIcon className="w-6 h-6 text-indigo-600" />
+                <span>Creator Page</span>
             </Link>
 
             {/* Section for profile and settings */}

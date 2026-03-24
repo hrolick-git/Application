@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { CalendarIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, PlusCircleIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 interface NavLinksProps {
   isAuthenticated: boolean;
@@ -30,6 +30,10 @@ export const NavLinks = ({ isAuthenticated }: NavLinksProps) => {
           <Link to="/events/new" className={getLinkClass('/events/new')}>
             <PlusCircleIcon className="w-5 h-5" />
             <span>Create</span>
+          </Link>
+          <Link to="/creator-page" className={getLinkClass('/creator-page')}>
+            <SparklesIcon className="w-5 h-5" />
+            <span>Creator Page</span>
           </Link>
         </>
       )}

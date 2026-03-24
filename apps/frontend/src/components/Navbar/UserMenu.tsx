@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { UserCircleIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, PlusCircleIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, PlusCircleIcon, CalendarIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 interface UserMenuProps {
   user: any;
@@ -35,6 +35,9 @@ export const UserMenu = ({ user, onLogout }: UserMenuProps) => {
         </Link>
         <Link to="/events/new" className={getLinkClass('/events/new')} title="Create">
           <PlusCircleIcon className="w-6 h-6" />
+        </Link>
+        <Link to="/creator-page" className={getLinkClass('/creator-page')} title="Creator Page">
+          <SparklesIcon className="w-6 h-6" />
         </Link>
       </div>
 
