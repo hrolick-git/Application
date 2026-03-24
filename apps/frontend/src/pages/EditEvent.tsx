@@ -66,7 +66,7 @@ export function EditEvent() {
       <div className="text-center mt-20">
         <p className="text-red-500 font-medium">{error}</p>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(id ? `/events/${id}` : "/events")}
           className="mt-4 text-indigo-600 hover:underline"
         >
           Back to Event Details
@@ -86,7 +86,7 @@ export function EditEvent() {
       <div className="max-w-xl mx-auto">
         {/* Back button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(id ? `/events/${id}` : "/events")}
           className="flex items-center text-slate-500 hover:text-slate-800 mb-6 transition-colors font-medium"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />

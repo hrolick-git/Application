@@ -270,7 +270,7 @@ export function EventDetails() {
       <div className="max-w-3xl mx-auto">
         {/* Back button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/events')}
           className="mb-6 flex items-center text-slate-500 hover:text-indigo-600 transition-colors font-medium text-sm group"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />

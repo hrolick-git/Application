@@ -50,7 +50,7 @@ export function CreateEvent() {
           className="flex items-center text-slate-500 hover:text-indigo-600 mb-8 transition-colors font-semibold group text-sm"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to list
+          Back to events
         </button>
 
         <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-100/50 border border-slate-100 overflow-hidden">
