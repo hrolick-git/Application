@@ -1,25 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  PencilSquareIcon,
   MapPinIcon,
   CalendarDaysIcon,
   UsersIcon,
   LockClosedIcon,
-  LinkIcon,
-  CpuChipIcon,
-  PaintBrushIcon,
-  BriefcaseIcon,
-  MusicalNoteIcon,
-  TrophyIcon,
-  CakeIcon,
-  PuzzlePieceIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/outline';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShareNodes, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { JoinButton } from './JoinButton';
 import { toast } from 'react-hot-toast';
 import api from '../api/api';
 import { EVENT_THEME_META, getEventTheme } from '../constants/eventThemes';
-import { getIconPattern, type IconPatternId } from '../constants/iconPatterns';
+import { ICON_PATTERN_META, getIconPattern } from '../constants/iconPatterns';
 
 interface Tag {
   id: string;
@@ -50,17 +42,6 @@ const TAG_COLORS: Record<string, string> = {
   Other:    'bg-slate-100 text-slate-600',
 };
 
-const PATTERN_ICON_MAP: Record<IconPatternId, any> = {
-  tech: CpuChipIcon,
-  art: PaintBrushIcon,
-  business: BriefcaseIcon,
-  music: MusicalNoteIcon,
-  sport: TrophyIcon,
-  food: CakeIcon,
-  game: PuzzlePieceIcon,
-  other: SparklesIcon,
-};
-
 export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) {
   const navigate = useNavigate();
   const isPrivate = e.visibility === 'PRIVATE';
@@ -69,6 +50,7 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
   const themeMeta = theme ? EVENT_THEME_META[theme] : null;
   const iconPattern = getIconPattern(e.iconPattern);
   const patternIconTone = themeMeta ? themeMeta.infoIcon : 'text-slate-400';
+  const faPatternIcon = iconPattern ? ICON_PATTERN_META[iconPattern].icon : null;
   const tags: Tag[] = e.tags || [];
   const creator: Creator | null = e.creator || e.organizer || null;
   const creatorLabel = creator?.name?.trim() || creator?.email || 'Unknown';
@@ -102,21 +84,20 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
         <div
           className="absolute inset-0 pointer-events-none select-none"
           style={{
-            maskImage: 'linear-gradient(to right, transparent 22%, rgba(0,0,0,0.12) 70%, rgba(0,0,0,0.2) 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 22%, rgba(0,0,0,0.12) 70%, rgba(0,0,0,0.2) 100%)',
+            maskImage: 'linear-gradient(to right, transparent 30%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.2) 100%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 30%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.2) 100%)',
           }}
         >
-          <div className="absolute right-0 -top-2 -bottom-8 w-[58%] grid grid-cols-7 gap-x-6 p-5">
-            {Array.from({ length: 7 }).map((_, colIdx) => {
-              const PatternIcon = PATTERN_ICON_MAP[iconPattern];
+          <div className="absolute right-0 top-2 bottom-0 w-[48%] grid grid-cols-5 gap-x-5 px-4 py-5">
+            {Array.from({ length: 5 }).map((_, colIdx) => {
               const isShiftedColumn = colIdx % 2 === 1;
-              const rightColNumber = 7 - colIdx;
+              const rightColNumber = 5 - colIdx;
               return (
                 <div
                   key={colIdx}
-                  className={`flex flex-col gap-y-5 ${isShiftedColumn ? 'translate-y-3' : ''}`}
+                  className={`flex flex-col gap-y-6 ${isShiftedColumn ? 'translate-y-4' : ''}`}
                 >
-                  {Array.from({ length: 11 }).map((__, rowIdx) => {
+                  {Array.from({ length: 9 }).map((__, rowIdx) => {
                     const rowNumber = rowIdx + 1;
                     const isPriorityIcon =
                       (rightColNumber === 1 && [2, 4, 6].includes(rowNumber)) ||
@@ -134,13 +115,13 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
                           : '1.25rem';
 
                     return (
-                      <PatternIcon
+                      <FontAwesomeIcon
                         key={`${colIdx}-${rowIdx}`}
+                        icon={faPatternIcon!}
                         className={`${patternIconTone}`}
                         style={{
                           opacity: isPriorityIcon ? 1 : 0.35,
-                          width: iconSize,
-                          height: iconSize,
+                          fontSize: iconSize,
                         }}
                       />
                     );
@@ -153,33 +134,36 @@ export function EventCard({ event: e, isOrganizer, onRefresh }: EventCardProps) 
       )}
 
       <div className="relative z-10 flex-1">
-        <div className="flex justify-between items-start mb-4">
-          <Link to={`/events/${e.id}`} className="hover:text-indigo-600 transition-colors flex-1 mr-2">
+        <div className="relative mb-4">
+          <Link
+            to={`/events/${e.id}`}
+            className={`block hover:text-indigo-600 transition-colors min-w-0 ${isOrganizer ? 'pr-20' : ''}`}
+          >
             <h2 className={`text-2xl font-bold leading-tight transition-colors ${
               hasTheme && themeMeta ? `${themeMeta.title} group-hover:opacity-85` : 'text-slate-800 group-hover:text-indigo-600'
             }`}>
               {e.title}
             </h2>
           </Link>
-          
+
           {isOrganizer && (
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="absolute right-0 top-0 flex items-center gap-1.5 rounded-full border border-white/70 bg-white/75 px-1.5 py-1 shadow-sm backdrop-blur-sm">
               {isPrivate && (
                 <button
                   type="button"
                   onClick={copyShareLink}
-                  className="p-2.5 rounded-2xl transition-all text-indigo-500 hover:bg-indigo-50"
+                  className="flex h-9 w-9 items-center justify-center rounded-full transition-all text-indigo-500 hover:bg-indigo-50"
                   title="Copy shared link"
                 >
-                  <LinkIcon className="w-6 h-6" />
+                  <FontAwesomeIcon icon={faShareNodes} className="text-base" />
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => navigate(`/events/${e.id}/edit`)}
-                className="p-2.5 rounded-2xl transition-all hover:rotate-12 text-amber-500 hover:bg-amber-50"
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-all hover:rotate-12 text-amber-500 hover:bg-amber-50"
               >
-                <PencilSquareIcon className="w-6 h-6" />
+                <FontAwesomeIcon icon={faPenToSquare} className="text-base" />
               </button>
             </div>
           )}
