@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useStore } from '../store/useStore';
-import api from '../api/api';
-import { AuthForm } from '../components/AuthForm';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useStore } from "../store/useStore";
+import api from "../api/api";
+import { AuthForm } from "../components/AuthForm";
+import { toast } from "react-hot-toast";
 
 export function Login() {
   const [loading, setLoading] = useState(false);
@@ -11,36 +12,44 @@ export function Login() {
   const handleLogin = async (data: any) => {
     setLoading(true);
     try {
-      const res = await api.post('/auth/login', data);
+      const res = await api.post("/auth/login", data);
 
-      // 1. Зберігаємо токен (щоб працювали наступні запити до API)
+      // 1. Save the token (so subsequent requests to the API will work)
       const token = res.data.access_token;
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
 
-      // 2. ОНОВЛЮЄМО ZUSTAND (Це те, чого не вистачало!)
-      // Витягуємо функцію setUser зі стору
+      // 2. Update user in Zustand using fresh backend profile data
       const setUser = useStore.getState().setUser;
-      
-      // Беремо юзера з відповіді бекенду. 
-      // Якщо бекенд ще не оновлено, використовуємо fallback (тимчасове рішення)
-      const userData = res.data.user || { email: data.email, id: 'temp-id' };
+
+      let userData = res.data.user;
+      if (!userData?.id) {
+        const me = await api.get("/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        userData = me.data;
+      }
+
       setUser(userData);
 
-      // 3. Тепер редирект
-      navigate('/events');
+      // 3. Redirect to the events page
+      navigate("/events");
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Login failed');
+      toast.error(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center bg-slate-50 p-6">
-      <div className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-100 border border-slate-100">
-        <h1 className="text-4xl font-black text-slate-900 mb-2">Welcome Back! 👋</h1>
-        <p className="text-slate-500 mb-10 font-medium">Good to see you again. Log in to your account.</p>
-        
+    <div className="flex items-center justify-center p-0 md:p-6 min-h-[calc(100vh-70px)]">
+      <div className="max-w-md w-full bg-white rounded-[2.5rem] p-6 md:p-10 shadow-2xl shadow-indigo-100 border border-slate-100">
+        <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-2">
+          Welcome Back! 👋
+        </h1>
+        <p className="text-slate-500 mb-10 font-medium">
+          Good to see you again. Log in to your account.
+        </p>
+
         <AuthForm type="login" onSubmit={handleLogin} isLoading={loading} />
       </div>
     </div>

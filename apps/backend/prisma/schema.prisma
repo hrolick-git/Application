@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -12,10 +13,35 @@ model User {
   email        String      @unique
   name         String?
   passwordHash String
+  vibecoins    Int         @default(5)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   organized    Event[]     @relation("organizer")
   participants Participant[]
+  redemptions  VibecoinRedemption[]
+  creatorPage  CreatorPage?
+}
+
+model VibecoinRedemption {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  code      String
+  amount    Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, code])
+}
+
+model CreatorPage {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  description String?
+  organizer   User     @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  organizerId String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Event {
@@ -27,11 +53,15 @@ model Event {
   location    String
   capacity    Int?
   visibility  Visibility    @default(PUBLIC)
+  shareToken  String?       @unique
+  colorTheme  String?
+  iconPattern String?
   organizer   User          @relation("organizer", fields: [organizerId], references: [id])
   organizerId String
   participants Participant[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  tags EventTag[]
 }
 
 model Participant {
@@ -42,6 +72,21 @@ model Participant {
   joinedAt   DateTime @default(now())
 
   @@id([userId, eventId])
+}
+
+model Tag {
+  id     String       @id @default(uuid())
+  name   String       @unique
+  events EventTag[]
+}
+
+model EventTag {
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId String
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId   String
+
+  @@id([eventId, tagId])
 }
 
 enum Visibility {

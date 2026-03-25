@@ -9,13 +9,14 @@ export function AppInit({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // перевіряємо токен
+    const token = localStorage.getItem("token"); // check token
     if (!token) {
       setLoading(false);
       return;
     }
 
-    api.get("/users/me") // підтягуємо користувача з бекенду
+    api
+      .get("/users/me") // fetch user from backend
       .then((res) => setUser(res.data))
       .catch(() => {
         localStorage.removeItem("token");
@@ -24,7 +25,7 @@ export function AppInit({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Loader />; // поки завантажується, спінер
+  if (loading) return <Loader />; // while loading, show spinner
 
   return <>{children}</>;
 }

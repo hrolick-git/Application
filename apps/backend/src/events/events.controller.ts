@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Req,
+  Query,
   UseGuards,
   UsePipes,
   NotFoundException,
@@ -22,46 +23,58 @@ export class EventsController {
   constructor(private readonly events: EventsService) {}
 
   /* =======================
-     🌍 ПУБЛІЧНІ РОУТИ
+     🌍 Public routers
      ======================= */
 
-  /** Список публічних подій */
+  /** List public events */
   @Get('public')
-  async publicList() {
-    return this.events.findPublicEvents();
+  async publicList(@Query('archived') archived?: string) {
+    return this.events.findPublicEvents(undefined, archived === 'true');
   }
 
-  /** Публічна конкретна подія */
+  /** Public specific event */
   @Get('public/:id')
   async publicEvent(@Param('id') id: string) {
     const event = await this.events.findById(id);
 
     if (!event || event.visibility !== 'PUBLIC') {
-      throw new NotFoundException('Подія не знайдена');
+      throw new NotFoundException('Event not found');
     }
 
     return event;
   }
 
-  /* =======================
-     🔐 АВТОРИЗОВАНІ РОУТИ
-     ======================= */
-
-  /** Список подій (PUBLIC + свої PRIVATE) */
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  async list(@Req() req: any) {
-    return this.events.list(req.user.id);
+  /** Private event by shared link */
+  @Get('shared/:shareToken')
+  async sharedEvent(@Param('shareToken') shareToken: string) {
+    return this.events.findSharedEvent(shareToken);
   }
 
-  /** Конкретна подія (PUBLIC або своя PRIVATE) */
+  /** Get all tags */
+  @Get('tags')
+  async getTags() {
+    return this.events.getTags();
+  }
+
+  /* =======================
+     🔐 Authenticated routers
+     ======================= */
+
+  /** List events (PUBLIC + your PRIVATE) */
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async list(@Req() req: any, @Query('archived') archived?: string) {
+    return this.events.list(req.user.id, undefined, archived === 'true');
+  }
+
+  /** Specific event (PUBLIC or your PRIVATE) */
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getById(@Param('id') id: string, @Req() req: any) {
     return this.events.get(id, req.user.id);
   }
 
-  /** Створення події */
+  /** Create event */
   @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(new ValidationPipe(createEventSchema))
@@ -69,18 +82,18 @@ export class EventsController {
     return this.events.create(dto, req.user.id);
   }
 
-  /** Редагування події (тільки організатор) */
-@UseGuards(JwtAuthGuard)
-@Patch(':id')
-async update(
-  @Param('id') id: string,
-  @Body(new ValidationPipe(updateEventSchema)) dto: UpdateEventDto, // ДОДАЙТЕ СЮДИ
-  @Req() req: any,
-) {
-  return this.events.update(id, dto, req.user.id);
-}
+  /** Update event (only organizer) */
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body(new ValidationPipe(updateEventSchema)) dto: UpdateEventDto, // ДОДАЙТЕ СЮДИ
+    @Req() req: any,
+  ) {
+    return this.events.update(id, dto, req.user.id);
+  }
 
-  /** Видалення події (тільки організатор) */
+  /** Delete event (only organizer) */
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string, @Req() req: any) {
@@ -92,6 +105,42 @@ async update(
   @Post(':id/join')
   async join(@Param('id') id: string, @Req() req: any) {
     return this.events.join(id, req.user.id);
+  }
+
+  /** Join private event by shared link */
+  @UseGuards(JwtAuthGuard)
+  @Post('shared/:shareToken/join')
+  async joinByShareToken(@Param('shareToken') shareToken: string, @Req() req: any) {
+    return this.events.joinByShareToken(shareToken, req.user.id);
+  }
+
+  /** Get or create share link token (only private event organizer) */
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/share-link')
+  async getOrCreateShareLink(@Param('id') id: string, @Req() req: any) {
+    return this.events.getOrCreateShareToken(id, req.user.id);
+  }
+
+  /** Spend 1 vibecoin to change event color theme (organizer only) */
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/theme')
+  async changeTheme(
+    @Param('id') id: string,
+    @Body('theme') theme: string | null,
+    @Req() req: any,
+  ) {
+    return this.events.changeTheme(id, req.user.id, theme);
+  }
+
+  /** Spend 1 vibecoin to set icon pattern background (organizer only) */
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/icon-pattern')
+  async changeIconPattern(
+    @Param('id') id: string,
+    @Body('pattern') pattern: string | null,
+    @Req() req: any,
+  ) {
+    return this.events.changeIconPattern(id, req.user.id, pattern);
   }
 
   /** Leave */

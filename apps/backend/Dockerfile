@@ -1,24 +1,21 @@
-# apps/backend/Dockerfile
-
 FROM node:20-bullseye-slim
-
-# Встановлюємо робочу директорію
 WORKDIR /app
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Копіюємо тільки package.json та package-lock.json для кешування npm install
-COPY apps/backend/package*.json ./
+ENV PRISMA_CLI_QUERY_ENGINE_TYPE=library
+ENV PRISMA_CLIENT_ENGINE_TYPE=library
 
-# Встановлюємо залежності
-RUN npm install --legacy-peer-deps
+COPY package*.json ./
+COPY prisma ./prisma/
 
-# Копіюємо весь бекенд (включно з Prisma)
-COPY apps/backend .
+RUN npm install --legacy-peer-deps --include=dev
 
-# Генеруємо Prisma Client
-RUN npx prisma generate
+COPY . .
 
-# Відкриваємо порт бекенду
+RUN npx prisma generate --schema ./prisma/schema.prisma
+
+RUN npx tsc --project tsconfig.json
+
 EXPOSE 4000
 
-# Команда для запуску
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/main.js"]
