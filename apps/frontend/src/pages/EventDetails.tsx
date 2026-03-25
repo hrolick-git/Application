@@ -13,17 +13,10 @@ import {
   PencilSquareIcon,
   LockClosedIcon,
   LinkIcon,
-  CpuChipIcon,
-  PaintBrushIcon,
-  BriefcaseIcon,
-  MusicalNoteIcon,
-  TrophyIcon,
-  CakeIcon,
-  PuzzlePieceIcon,
-  SparklesIcon,
   ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "react-hot-toast";
 import {
   EVENT_THEME_IDS,
@@ -83,17 +76,6 @@ const TAG_COLORS: Record<string, string> = {
   Game: "bg-red-100 text-red-700",
   Other: "bg-slate-100 text-slate-600",
 };
-
-const PATTERN_ICON_MAP = {
-  tech: CpuChipIcon,
-  art: PaintBrushIcon,
-  business: BriefcaseIcon,
-  music: MusicalNoteIcon,
-  sport: TrophyIcon,
-  food: CakeIcon,
-  game: PuzzlePieceIcon,
-  other: SparklesIcon,
-} as const;
 
 export function EventDetails() {
   const { id, shareToken } = useParams();
@@ -297,21 +279,20 @@ export function EventDetails() {
               <div
                 className="absolute inset-0 pointer-events-none select-none overflow-hidden"
                 style={{
-                  maskImage: "linear-gradient(to right, transparent 18%, rgba(0,0,0,0.12) 64%, rgba(0,0,0,0.2) 100%)",
-                  WebkitMaskImage: "linear-gradient(to right, transparent 18%, rgba(0,0,0,0.12) 64%, rgba(0,0,0,0.2) 100%)",
+                  maskImage: "linear-gradient(to right, transparent 26%, rgba(0,0,0,0.12) 68%, rgba(0,0,0,0.2) 100%)",
+                  WebkitMaskImage: "linear-gradient(to right, transparent 26%, rgba(0,0,0,0.12) 68%, rgba(0,0,0,0.2) 100%)",
                 }}
               >
-                <div className="absolute right-0 -top-2 -bottom-8 w-[58%] grid grid-cols-9 gap-x-3 p-3">
-                  {Array.from({ length: 9 }).map((_, colIdx) => {
-                    const PatternIcon = PATTERN_ICON_MAP[activeIconPattern];
+                <div className="absolute right-0 top-1 bottom-0 w-[50%] grid grid-cols-7 gap-x-4 px-4 py-4">
+                  {Array.from({ length: 7 }).map((_, colIdx) => {
                     const isShiftedColumn = colIdx % 2 === 1;
-                    const rightColNumber = 9 - colIdx;
+                    const rightColNumber = 7 - colIdx;
                     return (
                       <div
                         key={colIdx}
-                        className={`flex flex-col gap-y-3 ${isShiftedColumn ? "translate-y-2" : ""}`}
+                        className={`flex flex-col gap-y-4 ${isShiftedColumn ? "translate-y-3" : ""}`}
                       >
-                        {Array.from({ length: 16 }).map((__, rowIdx) => {
+                        {Array.from({ length: 12 }).map((__, rowIdx) => {
                           const rowNumber = rowIdx + 1;
                           const isPriorityIcon =
                             (rightColNumber === 1 && [2, 4, 6].includes(rowNumber)) ||
@@ -329,13 +310,13 @@ export function EventDetails() {
                                 : "1.25rem";
 
                           return (
-                            <PatternIcon
+                            <FontAwesomeIcon
                               key={`${colIdx}-${rowIdx}`}
+                              icon={ICON_PATTERN_META[activeIconPattern].icon}
                               className={`${patternIconTone}`}
                               style={{
                                 opacity: isPriorityIcon ? 1 : 0.35,
-                                width: iconSize,
-                                height: iconSize,
+                                fontSize: iconSize,
                               }}
                             />
                           );
@@ -574,7 +555,7 @@ export function EventDetails() {
                     <p className="text-[10px] text-slate-400 font-medium">1 coin each</p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-[264px] pr-0.5">
                     <button
                       type="button"
                       onClick={() => setPreviewTheme("default")}
@@ -659,7 +640,7 @@ export function EventDetails() {
                     <p className="text-[10px] text-slate-400 font-medium">1 coin each</p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-[264px] pr-0.5">
                     <button
                       type="button"
                       onClick={() => setPreviewPattern("none")}
@@ -680,7 +661,6 @@ export function EventDetails() {
                       const meta = ICON_PATTERN_META[pid];
                       const selected = activePatternSelection === pid;
                       const saved = savedPattern === pid;
-                      const PatternIcon = PATTERN_ICON_MAP[pid];
                       return (
                         <button
                           key={pid}
@@ -701,8 +681,9 @@ export function EventDetails() {
                           >
                             <span className={`absolute inset-0 grid grid-cols-5 content-start gap-x-2 gap-y-1.5 p-1 ${patternIconTone}`}>
                               {Array.from({ length: 10 }).map((_, i) => (
-                                <PatternIcon
+                                <FontAwesomeIcon
                                   key={i}
+                                  icon={meta.icon}
                                   className={`w-4 h-4 ${i % 2 === 1 ? "translate-y-0.5" : ""} opacity-80`}
                                 />
                               ))}
